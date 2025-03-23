@@ -1,0 +1,28 @@
+<odoo>
+    <data noupdate="1">
+        <!-- Sequences for Archive Management -->
+        <record id="seq_archive_in" model="ir.sequence">
+            <field name="name">Incoming Archive Sequence</field>
+            <field name="code">mfz.archive.in</field>
+            <field name="prefix">IN/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_archive_out" model="ir.sequence">
+            <field name="name">Outgoing Archive Sequence</field>
+            <field name="code">mfz.archive.out</field>
+            <field name="prefix">OUT/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_archive_memo" model="ir.sequence">
+            <field name="name">Memo Archive Sequence</field>
+            <field name="code">mfz.archive.memo</field>
+            <field name="prefix">MEMO/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

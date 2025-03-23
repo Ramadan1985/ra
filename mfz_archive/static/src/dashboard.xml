@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="archive_management.Dashboard">
+        <div class="o_archive_dashboard">
+            <!-- رأس الصفحة -->
+            <div class="o_dashboard_header mb-3">
+                <h1>Archive Management Dashboard</h1>
+                <button class="btn btn-primary" t-on-click="loadData">Refresh</button>
+            </div>
+
+            <!-- لوحة المعلومات -->
+            <div class="row" t-if="!state.loading">
+                <!-- إحصائيات نوع المستند -->
+                <div class="col-lg-3 col-md-6 col-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Document Types</h5>
+                            <div class="d-flex flex-column">
+                                <button class="btn btn-light border mb-2 d-flex justify-content-between align-items-center"
+                                        t-on-click="() => this.openDocuments('Incoming', [['document_type', '=', 'incoming']])">
+                                    <span>Incoming</span>
+                                    <span class="badge bg-primary rounded-pill"><t t-esc="state.stats.incoming"/></span>
+                                </button>
+                                <button class="btn btn-light border mb-2 d-flex justify-content-between align-items-center"
+                                        t-on-click="() => this.openDocuments('Outgoing', [['document_type', '=', 'outgoing']])">
+                                    <span>Outgoing</span>
+                                    <span class="badge bg-secondary rounded-pill"><t t-esc="state.stats.outgoing"/></span>
+                                </button>
+                                <button class="btn btn-light border d-flex justify-content-between align-items-center"
+                                        t-on-click="() => this.openDocuments('Memo', [['document_type', '=', 'memo']])">
+                                    <span>Memo</span>
+                                    <span class="badge bg-info rounded-pill"><t t-esc="state.stats.memo"/></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- إحصائيات حالة المستند -->
+                <div class="col-lg-3 col-md-6 col-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Document Status</h5>
+                            <div class="d-flex flex-column">
+                                <button class="btn btn-light border mb-2 d-flex justify-content-between align-items-center"
+                                        t-on-click="() => this.openDocuments('Draft', [['state', '=', 'draft']])">
+                                    <span>Draft</span>
+                                    <span class="badge bg-warning rounded-pill"><t t-esc="state.stats.draft"/></span>
+                                </button>
+                                <button class="btn btn-light border mb-2 d-flex justify-content-between align-items-center"
+                                        t-on-click="() => this.openDocuments('In Review', [['state', '=', 'in_review']])">
+                                    <span>In Review</span>
+                                    <span class="badge bg-info rounded-pill"><t t-esc="state.stats.in_review"/></span>
+                                </button>
+                                <button class="btn btn-light border mb-2 d-flex justify-content-between align-items-center"
+                                        t-on-click="() => this.openDocuments('Approved', [['state', '=', 'approved']])">
+                                    <span>Approved</span>
+                                    <span class="badge bg-success rounded-pill"><t t-esc="state.stats.approved"/></span>
+                                </button>
+                                <button class="btn btn-light border d-flex justify-content-between align-items-center"
+                                        t-on-click="() => this.openDocuments('Rejected', [['state', '=', 'rejected']])">
+                                    <span>Rejected</span>
+                                    <span class="badge bg-danger rounded-pill"><t t-esc="state.stats.rejected"/></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ربما تضيف المزيد من البطاقات والإحصائيات هنا -->
+            </div>
+
+            <!-- رسالة التحميل -->
+            <div class="text-center p-5" t-if="state.loading">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading dashboard data...</p>
+            </div>
+        </div>
+    </t>
+</templates>

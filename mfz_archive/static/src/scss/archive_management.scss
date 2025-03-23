@@ -1,0 +1,46 @@
+// Soporte para RTL (árabe)
+.o_form_view.o_form_editable.o_rtl {
+    .o_form_sheet_bg {
+        direction: rtl;
+    }
+
+    .o_group {
+        &.o_inner_group {
+            display: flex;
+            flex-flow: row wrap;
+        }
+    }
+
+    // Corregir alineación de campos
+    .o_field_widget {
+        &.o_text_overflow {
+            text-align: right;
+        }
+    }
+
+    // Corregir alineación de botones en la cabecera
+    .o_form_statusbar {
+        .o_statusbar_buttons {
+            margin-right: 0;
+            margin-left: auto;
+        }
+    }
+}
+
+// Estilos generales para arreglar problemas de diseño
+.archive-management-form {
+    .o_form_sheet {
+        min-height: 600px;
+    }
+
+    .o_notebook {
+        clear: both;
+    }
+
+    // Evitar que algunos campos se rompan en la vista
+    .o_field_widget {
+        &.o_field_many2many {
+            width: 100%;
+        }
+    }
+}

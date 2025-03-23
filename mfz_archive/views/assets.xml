@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="archive_management_assets_backend" model="ir.asset">
+        <field name="name">Archive Management Backend Assets</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">archive_management/static/src/components/dashboard.js</field>
+    </record>
+
+    <record id="archive_management_assets_qweb" model="ir.asset">
+        <field name="name">Archive Management QWeb Assets</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">archive_management/static/src/dashboard.xml</field>
+    </record>
+</odoo>

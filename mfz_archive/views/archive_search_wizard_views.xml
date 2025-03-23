@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- نموذج البحث المتقدم في النص -->
+    <record id="view_archive_content_search_wizard_form" model="ir.ui.view">
+        <field name="name">archive.content.search.wizard.form</field>
+        <field name="model">archive.content.search.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="search_term" placeholder="أدخل نص البحث هنا..." autofocus="1"/>
+                        <field name="model" invisible="1"/>
+                    </group>
+
+                    <group string="خيارات البحث">
+                        <group string="نطاق البحث">
+                            <field name="search_in_name"/>
+                            <field name="search_in_description"/>
+                            <field name="search_in_content"/>
+                        </group>
+                        <group string="خيارات متقدمة">
+                            <field name="search_reversed" string="البحث في النص المعكوس"/>
+                            <field name="use_stemming" string="استخدام جذور الكلمات"/>
+                            <field name="semantic_search" string="بحث دلالي"/>
+                        </group>
+                    </group>
+
+                    <group string="إعدادات الدقة">
+                        <group>
+                            <field name="case_sensitive"/>
+                            <field name="whole_word"/>
+                        </group>
+                        <group>
+                            <field name="fuzzy_search" string="بحث مرن (أخطاء إملائية)"/>
+                            <field name="fuzzy_threshold" string="درجة التشابه (1-5)" invisible="not fuzzy_search"/>
+                        </group>
+                    </group>
+
+                    <div class="alert alert-info" role="alert">
+                        <h4><i class="fa fa-info-circle" title="معلومات"></i> إرشادات البحث</h4>
+                        <ul>
+                            <li><b>البحث في النص المعكوس:</b> يساعد في العثور على النصوص المستخرجة بشكل معكوس من ملفات PDF.</li>
+                            <li><b>استخدام جذور الكلمات:</b> يبحث عن أشكال مختلفة من الكلمات (مثل: ميناء، الميناء، موانئ).</li>
+                            <li><b>البحث الدلالي:</b> يبحث عن المعنى وليس فقط عن الكلمات المحددة.</li>
+                            <li><b>البحث المرن:</b> يسمح بإيجاد النتائج حتى مع وجود أخطاء إملائية أو تبادل في ترتيب الحروف.</li>
+                            <li><b>درجة التشابه:</b> رقم أقل (1-2) للنتائج الأكثر شمولاً، رقم أعلى (4-5) للنتائج الأكثر دقة.</li>
+                        </ul>
+                        <p class="mt-2"><i class="fa fa-lightbulb-o" title="نصيحة"></i> <b>نصيحة:</b> للبحث في النصوص المعكوسة، استخدم كلمات مميزة وفعّل "البحث في النص المعكوس" وقم بضبط درجة التشابه على قيمة منخفضة (1 أو 2).</p>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_search" string="بحث" type="object" class="btn-primary"/>
+                    <button name="action_search_similar" string="بحث عن مستندات مشابهة" type="object" class="btn-secondary"/>
+                    <button string="إلغاء" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- نتائج البحث (عرض مخصص للنتائج) -->
+    <record id="view_archive_search_results_list" model="ir.ui.view">
+        <field name="name">archive.management.search.results.list</field>
+        <field name="model">archive.management</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="reference"/>
+                <field name="document_type"/>
+                <field name="date"/>
+                <field name="category_id"/>
+                <field name="sent_by"/>
+                <field name="directed_to"/>
+                <field name="state"/>
+                <field name="attachment_id" widget="boolean" string="PDF"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- إجراء فتح مساعد البحث -->
+    <record id="action_archive_content_search" model="ir.actions.act_window">
+        <field name="name">بحث متقدم في المحتوى</field>
+        <field name="res_model">archive.content.search.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_archive_content_search_wizard_form"/>
+        <field name="target">new</field>
+        <field name="help" type="html">
+            <p>
+                استخدم هذه الأداة للبحث بشكل متقدم في محتوى الوثائق المؤرشفة. يمكنك البحث في النص المستخرج من ملفات PDF حتى مع وجود مشكلات في الاستخراج.
+            </p>
+        </field>
+    </record>
+
+    <!-- إجراء لعرض نتائج البحث -->
+    <record id="action_archive_search_results" model="ir.actions.act_window">
+        <field name="name">نتائج البحث</field>
+        <field name="res_model">archive.management</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_archive_search_results_list"/>
+        <field name="search_view_id" ref="view_archive_management_search"/>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+
+    <!-- عنصر القائمة للوصول المباشر للبحث المتقدم -->
+    <menuitem id="menu_archive_content_search"
+              name="بحث متقدم"
+              parent="menu_archive_management"
+              action="action_archive_content_search"
+              sequence="50"/>
+
+    <!-- زر شريط الأدوات للبحث السريع -->
+    <record id="action_archive_quick_search" model="ir.actions.client">
+        <field name="name">بحث سريع</field>
+        <field name="tag">archive_quick_search</field>
+    </record>
+
+    <!-- عنصر القائمة لعرض نتائج البحث الأخيرة -->
+    <menuitem id="menu_archive_recent_searches"
+              name="نتائج البحث الأخيرة"
+              parent="menu_archive_management"
+              action="action_archive_search_results"
+              sequence="51"/>
+
+    <!-- تعريف التسلسل -->
+    <record id="sequence_archive_search_log" model="ir.sequence">
+        <field name="name">سجل البحث في الأرشيف</field>
+        <field name="code">archive.search.log</field>
+        <field name="prefix">SEARCH/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>

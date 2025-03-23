@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- تصنيفات افتراضية -->
+        <record id="archive_category_administrative" model="archive.category">
+            <field name="name">Administrative</field>
+            <field name="code">ADM</field>
+            <field name="description">Administrative documents</field>
+        </record>
+
+        <record id="archive_category_financial" model="archive.category">
+            <field name="name">Financial</field>
+            <field name="code">FIN</field>
+            <field name="description">Financial documents</field>
+        </record>
+
+        <record id="archive_category_hr" model="archive.category">
+            <field name="name">Human Resources</field>
+            <field name="code">HR</field>
+            <field name="description">HR documents</field>
+        </record>
+
+        <record id="archive_category_legal" model="archive.category">
+            <field name="name">Legal</field>
+            <field name="code">LEG</field>
+            <field name="description">Legal documents</field>
+        </record>
+
+        <record id="archive_category_technical" model="archive.category">
+            <field name="name">Technical</field>
+            <field name="code">TEC</field>
+            <field name="description">Technical documents</field>
+        </record>
+
+        <!-- تصنيفات فرعية -->
+        <record id="archive_category_contracts" model="archive.category">
+            <field name="name">Contracts</field>
+            <field name="code">CONT</field>
+            <field name="description">Contracts and agreements</field>
+            <field name="parent_id" ref="archive_category_legal"/>
+        </record>
+
+        <record id="archive_category_invoices" model="archive.category">
+            <field name="name">Invoices</field>
+            <field name="code">INV</field>
+            <field name="description">Invoices and bills</field>
+            <field name="parent_id" ref="archive_category_financial"/>
+        </record>
+    </data>
+</odoo>

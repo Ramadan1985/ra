@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View for Archive Category -->
+    <record id="view_archive_category_form" model="ir.ui.view">
+        <field name="name">archive.category.form</field>
+        <field name="model">archive.category</field>
+        <field name="arch" type="xml">
+            <form string="Document Category">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_documents" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="document_count" widget="statinfo" string="Documents"/>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="parent_id"/>
+                        <field name="description"/>
+                        <field name="active" invisible="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Child Categories" name="child_categories">
+                            <field name="child_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="document_count"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View for Archive Category -->
+    <record id="view_archive_category_list" model="ir.ui.view">
+        <field name="name">archive.category.list</field>
+        <field name="model">archive.category</field>
+        <field name="arch" type="xml">
+            <list string="Document Categories">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <field name="document_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View for Archive Category -->
+    <record id="view_archive_category_search" model="ir.ui.view">
+        <field name="name">archive.category.search</field>
+        <field name="model">archive.category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="parent_id"/>
+                <filter string="Top Level Categories" name="top_level" domain="[('parent_id', '=', False)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Hierarchy Tree View for Archive Category -->
+    <record id="view_archive_category_tree" model="ir.ui.view">
+        <field name="name">archive.category.tree</field>
+        <field name="model">archive.category</field>
+        <field name="arch" type="xml">
+            <list string="Categories Hierarchy">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="document_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_archive_category" model="ir.actions.act_window">
+        <field name="name">Document Categories</field>
+        <field name="res_model">archive.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first document category
+            </p>
+            <p>
+                Categories allow you to organize your documents in a hierarchical structure.
+            </p>
+        </field>
+    </record>
+
+    <!-- Hierarchy Action -->
+    <record id="action_archive_category_hierarchy" model="ir.actions.act_window">
+        <field name="name">Categories Hierarchy</field>
+        <field name="res_model">archive.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_archive_category_tree"/>
+        <field name="domain">[('parent_id', '=', False)]</field>
+        <field name="context">{'default_parent_id': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create the root categories
+            </p>
+        </field>
+    </record>
+</odoo>
