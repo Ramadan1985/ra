@@ -1,46 +1,107 @@
-// Soporte para RTL (árabe)
-.o_form_view.o_form_editable.o_rtl {
-    .o_form_sheet_bg {
+// ========================
+// أنماط لوحة المعلومات
+// ========================
+
+.archive_dashboard {
+    padding: 16px;
+    background-color: #f8f9fa;
+    min-height: 100%;
+
+    &_header {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 15px !important;
+        margin-bottom: 20px !important;
+
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #495057;
+        }
+    }
+
+    .dashboard-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: normal;
+        }
+    }
+
+    .hover-bg-light {
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #f8f9fa;
+        }
+    }
+
+    .chart-container {
+        canvas {
+            width: 100% !important;
+        }
+    }
+
+    // تصحيح محاذاة RTL للرسوم البيانية
+    .rtl-chart {
         direction: rtl;
     }
 
-    .o_group {
-        &.o_inner_group {
-            display: flex;
-            flex-flow: row wrap;
-        }
-    }
+    // حالة التحميل
+    &.o-loading {
+        position: relative;
 
-    // Corregir alineación de campos
-    .o_field_widget {
-        &.o_text_overflow {
-            text-align: right;
-        }
-    }
-
-    // Corregir alineación de botones en la cabecera
-    .o_form_statusbar {
-        .o_statusbar_buttons {
-            margin-right: 0;
-            margin-left: auto;
+        &:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 1000;
         }
     }
 }
 
-// Estilos generales para arreglar problemas de diseño
-.archive-management-form {
-    .o_form_sheet {
-        min-height: 600px;
+// تعديلات RTL إضافية
+.o_rtl {
+    // عكس الأيقونات
+    .fa-long-arrow-right:before {
+        content: "\f177";
     }
 
-    .o_notebook {
-        clear: both;
+    .fa-long-arrow-left:before {
+        content: "\f178";
     }
 
-    // Evitar que algunos campos se rompan en la vista
-    .o_field_widget {
-        &.o_field_many2many {
-            width: 100%;
+    // تصحيح محاذاة القوائم
+    .list-group-item {
+        text-align: right;
+    }
+
+    // تصحيح محاذاة الأزرار
+    .btn-group {
+        .btn:first-child {
+            border-top-right-radius: 0.25rem !important;
+            border-bottom-right-radius: 0.25rem !important;
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+
+        .btn:last-child {
+            border-top-left-radius: 0.25rem !important;
+            border-bottom-left-radius: 0.25rem !important;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
         }
     }
 }

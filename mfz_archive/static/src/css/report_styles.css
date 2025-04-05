@@ -1,0 +1,36 @@
+/* ملف: mfz_archive/static/src/css/report_styles.css */
+
+/* تعريف خطوط للتقارير */
+@font-face {
+    font-family: 'Tajawal';
+    src: url('/mfz_archive/static/src/fonts/Tajawal-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Tajawal';
+    src: url('/mfz_archive/static/src/fonts/Tajawal-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* أنماط RTL للتقارير */
+.o_report_rtl {
+    direction: rtl;
+    font-family: 'Tajawal', sans-serif;
+}
+
+/* تحسين بعض عناصر التقرير */
+.o_report_rtl .table th,
+.o_report_rtl .table td {
+    text-align: right;
+}
+
+.o_report_rtl .text-right {
+    text-align: left !important;
+}
+
+.o_report_rtl .text-left {
+    text-align: right !important;
+}

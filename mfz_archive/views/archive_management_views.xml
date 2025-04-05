@@ -6,34 +6,38 @@
         <field name="model">archive.management</field>
         <field name="arch" type="xml">
             <form class="archive-management-form o_rtl">
-                <header>
-                    <button name="action_confirm" string="تأكيد" type="object" class="oe_highlight"
-                            invisible="state != 'draft'"/>
-                    <button name="action_in_review" string="قيد المراجعة" type="object" class="oe_highlight"
-                            invisible="state not in ('draft', 'rejected')"/>
-                    <button name="action_approve" string="موافقة" type="object" class="oe_highlight"
-                            invisible="state != 'in_review'"/>
-                    <button name="action_reject" string="رفض" type="object"
-                            invisible="state != 'in_review'"/>
-                    <button name="action_archive_doc" string="أرشفة" type="object" class="oe_highlight"
-                            invisible="state != 'approved'"/>
-                    <button name="action_draft" string="إعادة للمسودة" type="object"
-                            invisible="state == 'draft'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,in_review,approved,archived"/>
-                </header>
+   <header>
+    <button name="action_approve"
+        string="اعتماد"
+        type="object"
+        class="oe_highlight"
+        invisible="state != 'pending'"
+        groups="mfz_archive.group_archive_approver"/>
+
+    <button name="action_reset_to_pending"
+        string="إعادة لطلب الاعتماد"
+        type="object"
+        invisible="state != 'approved'"
+        groups="mfz_archive.group_archive_approver"/>
+
+    <field name="state" widget="statusbar"/>
+</header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" groups="mfz_archive.group_archive_manager">
                             <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
                         </button>
-                        <button name="action_view_history" type="object" class="oe_stat_button" icon="fa-history" string="السجل"/>
-                        <button name="action_open_attachment" type="object" class="oe_stat_button"
-                                icon="fa-file-pdf-o" string="عرض PDF" invisible="not attachment_id"/>
-                        <button name="action_check_duplicates" type="object" class="oe_stat_button"
-                                icon="fa-copy" string="البحث عن تكرارات"/>
-                        <!-- تغيير زر البحث لاستخدام دالة بدلا من إجراء -->
-                        <button name="action_content_search" type="object" class="oe_stat_button"
-                                icon="fa-search" string="بحث في النص"/>
+                      <!--  <button name="action_view_history" type="object" class="oe_stat_button" icon="fa-history" string="السجل"/>
+                        <button name="action_open_attachment" type="object" class="oe_stat_button" icon="fa-file-pdf" string="عرض PDF" invisible="not attachment_id"/>
+                        <button name="action_check_duplicates" type="object" class="oe_stat_button" icon="fa-copy" string="البحث عن تكرارات"/> -->
+                        <button name="action_content_search" type="object" class="oe_stat_button" icon="fa-search" string="بحث في النص"/>
+
+                    <button name="generate_summary" string="تلخيص المستند" type="object" class="btn-primary"
+                            invisible="indexed_content_2 == False"
+                            help="إنشاء ملخص تلقائي لمحتوى المستند"/>
+                        <!-- إضافة زر تحسين استخراج النص العربي -->
+                        <button name="improve_arabic_extraction" type="object" class="oe_stat_button" icon="fa-language"
+                                string="تحسين النص العربي" invisible="not attachment_id"/>
                     </div>
                     <field name="image" widget="image" class="oe_avatar"/>
                     <div class="oe_title">
@@ -45,10 +49,9 @@
                         </h3>
                     </div>
                     <group class="o_group_rtl">
-                        <!-- Cambiado a un solo grupo para mejor visualización RTL -->
+                        <!-- مجموعة حقول واحدة لعرض RTL أفضل -->
                         <group name="group_right" class="col-6">
-                            <!-- جعل نوع المستند للقراءة فقط بعد الإنشاء -->
-                            <field name="document_type" widget="radio" options="{'horizontal': true}" readonly="id"/>
+                            <field name="document_type" widget="radio" options="{'horizontal': true}" force_save="1"/>
                             <field name="date" widget="date"/>
                             <field name="deadline" widget="date" invisible="document_type == 'memo'" required="document_type != 'memo'"/>
                             <field name="category_id"/>
@@ -57,23 +60,34 @@
                         <group name="group_left" class="col-6">
                             <field name="sent_by" required="document_type in ('incoming', 'memo')"/>
                             <field name="directed_to" required="document_type in ('outgoing', 'memo')"/>
-                            <field name="user_id"/>
+                            <field name="user_id" groups="mfz_archive.group_archive_manager"/>
                             <field name="priority" widget="priority"/>
-                            <field name="confidentiality" widget="selection"/>
+                            <field name="confidentiality" widget="selection" groups="mfz_archive.group_archive_incoming_manager,mfz_archive.group_archive_outgoing_manager,mfz_archive.group_archive_memo_manager,mfz_archive.group_archive_manager"/>
                         </group>
                     </group>
-                    <!-- Añadir sección de archivo PDF -->
+                    <!-- قسم ملف PDF -->
                     <group string="ملف PDF" name="pdf_section">
-                        <field name="file" filename="file_name" widget="binary" class="oe_inline"/>
+                        <div class="d-flex align-items-center flex-wrap">
+                            <field name="file" filename="file_name" widget="binary" class="oe_inline me-2"/>
+                            <button name="action_open_scanner" string="فتح الماسح الضوئي" type="object" class="btn btn-secondary" icon="fa-scanner" help="فتح تعليمات المسح الضوئي"/>
+                        </div>
                         <field name="file_name" invisible="1"/>
                         <field name="attachment_id" invisible="1"/>
                         <field name="id" invisible="1"/>
                     </group>
                     <notebook class="mt-4">
                         <page string="المحتوى" name="content">
+                            <!-- إضافة المعلومات عن التلخيص -->
+                            <div class="alert alert-info" role="alert" invisible="summary_date == False">
+                                <p><i class="fa fa-info-circle" title="معلومات"></i> تم تلخيص المستند تلقائيًا بتاريخ: <field name="summary_date" readonly="1" class="ms-2" widget="datetime"/></p>
+                            </div>
+                            <!-- زر لإنشاء التلخيص -->
+                            <div class="d-flex justify-content-end mb-2" invisible="indexed_content_2 == False">
+                                <button name="generate_summary" string="إنشاء ملخص جديد" type="object" class="btn btn-secondary btn-sm" help="توليد ملخص جديد للمستند"/>
+                            </div>
                             <field name="description" placeholder="ادخل تفاصيل المستند هنا..." nolabel="1" class="o_text_right"/>
                         </page>
-                        <!-- إضافة صفحة جديدة لعرض ملف PDF -->
+                        <!-- صفحة عرض ملف PDF -->
                         <page string="عرض الملف" name="file_preview" invisible="not file">
                             <group>
                                 <field name="file" widget="pdf_viewer" filename="file_name" readonly="1" nolabel="1"/>
@@ -86,9 +100,26 @@
                             <div invisible="indexed_content_2" class="alert alert-info" role="alert">
                                 <p><i class="fa fa-info-circle" title="معلومات"></i> لا يوجد نص مستخرج من هذا المستند بعد.</p>
                             </div>
-                            <field name="indexed_content_2" readonly="1" nolabel="1" class="o_text_right"/>
+                            <!-- عرض معلومات حول حالة دعم اللغة العربية -->
+                            <div class="alert alert-warning" role="alert" invisible="not attachment_id">
+                                <p><i class="fa fa-language" title="معلومات"></i>
+                                    إذا كان النص العربي لا يظهر بشكل صحيح، جرب الضغط على زر <strong>"تحسين النص العربي"</strong> في أعلى الصفحة.
+                                </p>
+                            </div>
+                            <div class="d-flex justify-content-end mb-2">
+                              <!--  <button name="action_reprocess_text" string="إعادة معالجة النص" type="object" class="btn btn-secondary btn-sm" invisible="not attachment_id"/>
+                                 إضافة زر تحسين استخراج النص العربي -->
+                                <button name="improve_arabic_extraction" string="تحسين النص العربي" type="object"
+                                        class="btn btn-info btn-sm ms-2" invisible="not attachment_id"/>
+                                <!-- إضافة زر تلخيص آخر -->
+                                <button name="generate_summary" string="تلخيص النص" type="object" class="btn btn-primary btn-sm ms-2" invisible="not indexed_content_2"/>
+                            </div>
+                            <!-- تغيير طريقة عرض النص المستخرج لدعم RTL -->
+                            <div dir="rtl" class="o_text_right p-2 border rounded" invisible="not indexed_content_2">
+                                <field name="indexed_content_2" readonly="1" nolabel="1"/>
+                            </div>
                         </page>
-                        <page string="الملاحظات الداخلية" name="notes">
+                        <page string="الملاحظات الداخلية" name="notes" groups="mfz_archive.group_archive_incoming_manager,mfz_archive.group_archive_outgoing_manager,mfz_archive.group_archive_memo_manager,mfz_archive.group_archive_manager">
                             <field name="notes" placeholder="ملاحظات داخلية..." nolabel="1" class="o_text_right"/>
                         </page>
                         <page string="المستندات المرتبطة" name="related_docs" invisible="not related_document_ids">
@@ -105,25 +136,24 @@
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
-                    <field name="message_follower_ids" widget="mail_followers"/>
-                    <field name="activity_ids" widget="mail_activity"/>
-                    <field name="message_ids" widget="mail_thread"/>
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
                 </div>
             </form>
         </field>
     </record>
 
-    <!-- Vista de Lista - Cambio de tree a list -->
+    <!-- عرض القائمة -->
     <record id="view_archive_management_tree" model="ir.ui.view">
         <field name="name">archive.management.tree</field>
         <field name="model">archive.management</field>
         <field name="arch" type="xml">
-            <list decoration-info="state == 'draft'"
-                  decoration-warning="state == 'in_review'" decoration-success="state == 'approved'"
-                  decoration-muted="state == 'archived'">
+            <list decoration-info="state == 'pending'"
+                  decoration-success="state == 'approved'">
                 <header>
-                    <!-- تغيير زر البحث هنا أيضا -->
-                    <button name="action_content_search" string="بحث متقدم في النص" type="object" class="btn-secondary"/>
+                    <!-- زر البحث في النص -->
+                    <button name="action_content_search" string="بحث متقدم في النص" type="object" class="btn btn-secondary"/>
                 </header>
                 <field name="name"/>
                 <field name="reference"/>
@@ -136,14 +166,16 @@
                 <field name="state"/>
                 <field name="priority" widget="priority" optional="show"/>
                 <field name="attachment_id" widget="boolean" string="PDF" optional="show"/>
-                <field name="user_id" optional="show"/>
+                <!-- إضافة حقل تاريخ التلخيص للقائمة -->
+                <field name="summary_date" optional="show" widget="datetime" string="تلخيص"/>
+                <field name="user_id" optional="show" groups="mfz_archive.group_archive_manager"/>
                 <field name="active" invisible="1"/>
                 <field name="indexed_content_2" invisible="1"/>
             </list>
         </field>
     </record>
 
-    <!-- Vista de Búsqueda -->
+    <!-- نموذج البحث -->
     <record id="view_archive_management_search" model="ir.ui.view">
         <field name="name">archive.management.search</field>
         <field name="model">archive.management</field>
@@ -161,15 +193,15 @@
                 <field name="indexed_content_2"/>
                 <separator/>
                 <filter string="بملف PDF" name="has_pdf" domain="[('attachment_id', '!=', False)]"/>
-                <filter string="وارد" name="incoming" domain="[('document_type', '=', 'incoming')]"/>
-                <filter string="صادر" name="outgoing" domain="[('document_type', '=', 'outgoing')]"/>
-                <filter string="مذكرات داخلية" name="memo" domain="[('document_type', '=', 'memo')]"/>
+                <!-- إضافة فلتر للمستندات الملخصة -->
+                <filter string="تم تلخيصها" name="summarized" domain="[('summary_date', '!=', False)]"/>
+                <!-- فلاتر أنواع المستندات بمعلومات context للإنشاء -->
+                <filter string="وارد" name="incoming" domain="[('document_type', '=', 'incoming')]" context="{'default_document_type': 'incoming', 'can_create': True}"/>
+                <filter string="صادر" name="outgoing" domain="[('document_type', '=', 'outgoing')]" context="{'default_document_type': 'outgoing', 'can_create': True}"/>
+                <filter string="مذكرات داخلية" name="memo" domain="[('document_type', '=', 'memo')]" context="{'default_document_type': 'memo', 'can_create': True}"/>
                 <separator/>
-                <filter string="مسودة" name="draft" domain="[('state', '=', 'draft')]"/>
-                <filter string="قيد المراجعة" name="in_review" domain="[('state', '=', 'in_review')]"/>
-                <filter string="موافق عليه" name="approved" domain="[('state', '=', 'approved')]"/>
-                <filter string="مرفوض" name="rejected" domain="[('state', '=', 'rejected')]"/>
-                <filter string="مؤرشف" name="archived_state" domain="[('state', '=', 'archived')]"/>
+                <filter string="طلب اعتماد" name="pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="معتمدة" name="approved" domain="[('state', '=', 'approved')]"/>
                 <separator/>
                 <filter string="أولوية عالية" name="high_priority" domain="[('priority', '=', '3')]"/>
                 <filter string="مستنداتي" name="my_documents" domain="[('user_id', '=', uid)]"/>
@@ -177,13 +209,13 @@
                     <filter string="نوع المستند" name="group_document_type" context="{'group_by': 'document_type'}"/>
                     <filter string="الحالة" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="التصنيف" name="group_category" context="{'group_by': 'category_id'}"/>
-                    <filter string="المسؤول" name="group_user_id" context="{'group_by': 'user_id'}"/>
+                    <filter string="المسؤول" name="group_user_id" context="{'group_by': 'user_id'}" groups="mfz_archive.group_archive_manager"/>
                 </group>
             </search>
         </field>
     </record>
 
-    <!-- Vista Kanban -->
+    <!-- نموذج Kanban -->
     <record id="view_archive_management_kanban" model="ir.ui.view">
         <field name="name">archive.management.kanban</field>
         <field name="model">archive.management</field>
@@ -198,6 +230,8 @@
                 <field name="state"/>
                 <field name="priority"/>
                 <field name="attachment_id"/>
+                <field name="summary_date"/>
+                <field name="indexed_content_2"/>
                 <templates>
                     <t t-name="card">
                         <div t-attf-class="oe_kanban_global_click">
@@ -205,7 +239,9 @@
                                 <div class="o_kanban_record_headings">
                                     <strong class="o_kanban_record_title">
                                         <span><t t-esc="record.name.value"/></span>
-                                        <i t-if="record.attachment_id.raw_value" class="fa fa-file-pdf-o text-danger" title="ملف PDF متاح"/>
+                                        <i t-if="record.attachment_id.raw_value" class="fa fa-file-pdf text-danger" title="ملف PDF متاح"/>
+                                        <!-- إضافة أيقونة للمستندات الملخصة -->
+                                        <i t-if="record.summary_date.raw_value" class="fa fa-file-text-o text-success ms-1" title="تم تلخيص المستند"/>
                                     </strong>
                                     <small class="text-muted o_kanban_record_subtitle">
                                         <span><t t-esc="record.reference.value"/></span>
@@ -219,6 +255,10 @@
                                         <t t-if="widget.editable">
                                             <a role="menuitem" type="edit" class="dropdown-item">تعديل</a>
                                         </t>
+                                        <!-- إضافة عنصر قائمة للتلخيص -->
+                                        <a role="menuitem" name="generate_summary" type="object" class="dropdown-item" t-if="record.indexed_content_2.raw_value">تلخيص المستند</a>
+                                        <!-- إضافة خيار لتحسين النص العربي -->
+                                        <a role="menuitem" name="improve_arabic_extraction" type="object" class="dropdown-item" t-if="record.attachment_id.raw_value">تحسين النص العربي</a>
                                     </div>
                                 </div>
                             </div>
@@ -247,20 +287,28 @@
         </field>
     </record>
 
-    <!-- Acción principal -->
+    <!-- الإجراء الرئيسي -->
     <record id="action_archive_management" model="ir.actions.act_window">
         <field name="name">إدارة الأرشيف</field>
         <field name="res_model">archive.management</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="view_archive_management_search"/>
-        <field name="context">{'search_default_my_documents': 1}</field>
+        <!-- تحديث السياق للمدراء وإخفاء زر "جديد" -->
+        <field name="context">{'search_default_my_documents': 0, 'create': false}</field>
+        <field name="groups_id" eval="[(4, ref('mfz_archive.group_archive_manager'))]"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                هنا أنشئ وثيقة أرشيفية جديدة
+                هنا يمكنك عرض كافة الوثائق الأرشيفية
             </p>
             <p>
-                قم بإدارة وتنظيم مستندات الأرشيف، والتحكم في سير العمل الخاص بها.
+                كمدير للنظام، يمكنك الوصول لجميع أنواع المستندات والتحكم فيها بشكل كامل.
             </p>
         </field>
+    </record>
+
+    <!-- إضافة سجل الإعدادات -->
+    <record id="config_auto_summary" model="ir.config_parameter">
+        <field name="key">archive_management.auto_summary</field>
+        <field name="value">False</field>
     </record>
 </odoo>

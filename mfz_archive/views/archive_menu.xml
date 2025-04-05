@@ -1,133 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- تعريف إجراءات الأنواع المختلفة للمستندات -->
-    <record id="action_archive_incoming" model="ir.actions.act_window">
-        <field name="name">المستندات الواردة</field>
-        <field name="res_model">archive.management</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('document_type', '=', 'incoming')]</field>
-        <field name="context">{'default_document_type': 'incoming', 'search_default_incoming': 1}</field>
-    </record>
+    <data>
+        <!-- تعريف مجموعة الأمان للمدراء -->
+        <record id="group_archive_manager" model="res.groups">
+            <field name="name">مدير الأرشيف</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
 
-    <record id="action_archive_outgoing" model="ir.actions.act_window">
-        <field name="name">المستندات الصادرة</field>
-        <field name="res_model">archive.management</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('document_type', '=', 'outgoing')]</field>
-        <field name="context">{'default_document_type': 'outgoing', 'search_default_outgoing': 1}</field>
-    </record>
+        <!-- تعريف مجموعات الأمان لمديري أنواع المستندات المختلفة -->
+        <record id="group_archive_incoming_manager" model="res.groups">
+            <field name="name">مدير المستندات الواردة</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
 
-    <record id="action_archive_memo" model="ir.actions.act_window">
-        <field name="name">المذكرات الداخلية</field>
-        <field name="res_model">archive.management</field>
-        <field name="view_mode">list,form</field>
-        <field name="domain">[('document_type', '=', 'memo')]</field>
-        <field name="context">{'default_document_type': 'memo', 'search_default_memo': 1}</field>
-    </record>
+        <record id="group_archive_outgoing_manager" model="res.groups">
+            <field name="name">مدير المستندات الصادرة</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
 
-    <!-- تعريف إجراءات نماذج الإعدادات -->
-    <record id="action_archive_directed_to" model="ir.actions.act_window">
-        <field name="name">موجه إلى</field>
-        <field name="res_model">archive.directed.to</field>
-        <field name="view_mode">list,form</field>
-    </record>
+        <record id="group_archive_memo_manager" model="res.groups">
+            <field name="name">مدير المذكرات الداخلية</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
 
-    <record id="action_archive_sent_by" model="ir.actions.act_window">
-        <field name="name">مرسل من</field>
-        <field name="res_model">archive.sent.by</field>
-        <field name="view_mode">list,form</field>
-    </record>
+        <record id="group_archive_user" model="res.groups">
+            <field name="name">مستخدم الأرشيف</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
 
-    <record id="action_archive_category" model="ir.actions.act_window">
-        <field name="name">التصنيفات</field>
-        <field name="res_model">archive.category</field>
-        <field name="view_mode">list,form</field>
-    </record>
+        <!-- تعريف القائمة الرئيسية -->
+        <record id="menu_archive_root" model="ir.ui.menu">
+            <field name="name">إدارة الأرشيف</field>
+            <field name="web_icon">mfz_archive,static/description/icon.png</field>
+            <field name="sequence">40</field>
+        </record>
 
-    <record id="action_archive_tag" model="ir.actions.act_window">
-        <field name="name">الوسوم</field>
-        <field name="res_model">archive.tag</field>
-        <field name="view_mode">list,form</field>
-    </record>
 
-    <!-- تعريف مجموعة الأمان للمدراء -->
-    <record id="group_archive_manager" model="res.groups">
-        <field name="name">مدير الأرشيف</field>
-        <field name="category_id" ref="base.module_category_hidden"/>
-        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
-    </record>
 
-    <!-- تعريف القائمة الرئيسية (هذا هو التعديل الرئيسي) -->
-    <menuitem id="menu_archive_root"
-              name="إدارة الأرشيف"
-              web_icon="mfz_archive,static/description/icon.png"
-              sequence="40"/>
+        <!-- إضافة قائمة لوحة المعلومات الرئيسية -->
+        <record id="menu_archive_dashboard_root" model="ir.ui.menu">
+            <field name="name">لوحة المعلومات</field>
+            <field name="parent_id" ref="menu_archive_root"/>
+            <field name="sequence">5</field>
+        </record>
 
-    <!-- قائمة المستندات - مع التفاصيل -->
-    <menuitem id="menu_archive_management"
-              name="المستندات"
-              parent="menu_archive_root"
-              sequence="10"/>
+        <!-- قائمة الإحصائيات -->
+        <record id="menu_archive_dashboard_stats" model="ir.ui.menu">
+            <field name="name">لوحة المعلومات الإحصائية</field>
+            <field name="parent_id" ref="menu_archive_dashboard_root"/>
+            <field name="action" ref="action_archive_dashboard_stats"/>
+            <field name="sequence">1</field>
+        </record>
 
-    <menuitem id="menu_archive_documents"
-              name="جميع المستندات"
-              parent="menu_archive_management"
-              action="action_archive_management"
-              sequence="5"/>
+        <!-- قائمة المستندات -->
+        <record id="menu_archive_management" model="ir.ui.menu">
+            <field name="name">المستندات</field>
+            <field name="parent_id" ref="menu_archive_root"/>
+            <field name="sequence">10</field>
+        </record>
 
-    <!-- إضافة قوائم المستندات حسب النوع -->
-    <menuitem id="archive_incoming_menu"
-              name="المستندات الواردة"
-              parent="menu_archive_management"
-              action="action_archive_incoming"
-              sequence="10"/>
+        <record id="menu_archive_documents" model="ir.ui.menu">
+            <field name="name">جميع المستندات</field>
+            <field name="parent_id" ref="menu_archive_management"/>
+            <field name="action" ref="action_archive_management"/>
+            <field name="sequence">5</field>
+            <field name="groups_id" eval="[(4, ref('group_archive_manager'))]"/>
+        </record>
 
-    <menuitem id="archive_outgoing_menu"
-              name="المستندات الصادرة"
-              parent="menu_archive_management"
-              action="action_archive_outgoing"
-              sequence="15"/>
+        <!-- قوائم المستندات حسب النوع مع تحديد الصلاحيات -->
+        <record id="archive_incoming_menu" model="ir.ui.menu">
+            <field name="name">المستندات الواردة</field>
+            <field name="parent_id" ref="menu_archive_management"/>
+            <field name="action" ref="action_archive_incoming"/>
+            <field name="sequence">10</field>
+            <field name="groups_id" eval="[(4, ref('group_archive_manager')), (4, ref('group_archive_incoming_manager'))]"/>
+        </record>
 
-    <menuitem id="archive_memo_menu"
-              name="المذكرات الداخلية"
-              parent="menu_archive_management"
-              action="action_archive_memo"
-              sequence="20"/>
+        <record id="archive_outgoing_menu" model="ir.ui.menu">
+            <field name="name">المستندات الصادرة</field>
+            <field name="parent_id" ref="menu_archive_management"/>
+            <field name="action" ref="action_archive_outgoing"/>
+            <field name="sequence">15</field>
+            <field name="groups_id" eval="[(4, ref('group_archive_manager')), (4, ref('group_archive_outgoing_manager'))]"/>
+        </record>
 
-    <!-- قائمة جهات الاتصال -->
-    <menuitem id="archive_contacts_menu"
-              name="جهات الاتصال"
-              parent="menu_archive_root"
-              sequence="20"/>
+        <record id="archive_memo_menu" model="ir.ui.menu">
+            <field name="name">المذكرات الداخلية</field>
+            <field name="parent_id" ref="menu_archive_management"/>
+            <field name="action" ref="action_archive_memo"/>
+            <field name="sequence">20</field>
+            <field name="groups_id" eval="[(4, ref('group_archive_manager')), (4, ref('group_archive_memo_manager'))]"/>
+        </record>
 
-    <menuitem id="archive_directed_to_menu"
-              name="موجه إلى"
-              parent="archive_contacts_menu"
-              action="action_archive_directed_to"
-              sequence="2"/>
+        <!-- قائمة البحث المتقدم -->
+        <record id="menu_archive_search_root" model="ir.ui.menu">
+            <field name="name">البحث المتقدم</field>
+            <field name="parent_id" ref="menu_archive_root"/>
+            <field name="sequence">15</field>
+        </record>
 
-    <menuitem id="archive_sent_by_menu"
-              name="مرسل من"
-              parent="archive_contacts_menu"
-              action="action_archive_sent_by"
-              sequence="3"/>
+        <!-- قائمة جهات الاتصال -->
+        <record id="archive_contacts_menu" model="ir.ui.menu">
+            <field name="name">جهات الاتصال</field>
+            <field name="parent_id" ref="menu_archive_root"/>
+            <field name="sequence">20</field>
+        </record>
 
-    <!-- قائمة الإعدادات -->
-    <menuitem id="archive_management_config_menu"
-              name="الإعدادات"
-              parent="menu_archive_root"
-              sequence="100"
-              groups="group_archive_manager"/>
+        <record id="archive_directed_to_menu" model="ir.ui.menu">
+            <field name="name">موجه إلى</field>
+            <field name="parent_id" ref="archive_contacts_menu"/>
+            <field name="action" ref="action_archive_directed_to"/>
+            <field name="sequence">2</field>
+        </record>
 
-    <menuitem id="archive_category_menu"
-              name="التصنيفات"
-              parent="archive_management_config_menu"
-              action="action_archive_category"
-              sequence="1"/>
+        <record id="archive_sent_by_menu" model="ir.ui.menu">
+            <field name="name">مرسل من</field>
+            <field name="parent_id" ref="archive_contacts_menu"/>
+            <field name="action" ref="action_archive_sent_by"/>
+            <field name="sequence">3</field>
+        </record>
 
-    <menuitem id="archive_tag_menu"
-              name="الوسوم"
-              parent="archive_management_config_menu"
-              action="action_archive_tag"
-              sequence="2"/>
+        <!-- قائمة الإعدادات -->
+        <record id="archive_management_config_menu" model="ir.ui.menu">
+            <field name="name">الإعدادات</field>
+            <field name="parent_id" ref="menu_archive_root"/>
+            <field name="sequence">100</field>
+            <field name="groups_id" eval="[(4, ref('group_archive_manager'))]"/>
+        </record>
+
+        <record id="archive_category_menu" model="ir.ui.menu">
+            <field name="name">التصنيفات</field>
+            <field name="parent_id" ref="archive_management_config_menu"/>
+            <field name="action" ref="action_archive_category"/>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="archive_tag_menu" model="ir.ui.menu">
+            <field name="name">الوسوم</field>
+            <field name="parent_id" ref="archive_management_config_menu"/>
+            <field name="action" ref="action_archive_tag"/>
+            <field name="sequence">2</field>
+        </record>
+
+    </data>
 </odoo>

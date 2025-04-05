@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="mfz_archive.BooleanButton" owl="1">
+        <button t-att-class="props.className || ''"
+                t-att-title="props.title || ''"
+                t-on-click.stop.prevent="onClick">
+            <t t-if="props.icon">
+                <i t-attf-class="fa fa-{{props.icon}}" role="img"
+                   t-att-aria-label="props.string || ''" />
+            </t>
+            <t t-if="props.string">
+                <span t-esc="props.string" />
+            </t>
+        </button>
+    </t>
+</templates>

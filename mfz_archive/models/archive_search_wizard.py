@@ -2,6 +2,7 @@
 from odoo import api, fields, models
 import re
 from difflib import SequenceMatcher
+from collections import Counter  # تم إضافة استيراد Counter هنا
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -12,6 +13,15 @@ class ArchiveContentSearchWizard(models.TransientModel):
     _description = 'Advanced Content Search Wizard'
 
     search_term = fields.Char('نص البحث', required=True)
+    date_from = fields.Date(string='من تاريخ', default=lambda self: fields.Date.today().replace(day=1))
+    date_to = fields.Date(string='إلى تاريخ', default=fields.Date.today())
+    # حقل جديد لنوع المستند
+    document_type = fields.Selection([
+        ('all', 'الكل'),
+        ('incoming', 'وارد'),
+        ('outgoing', 'صادر'),
+        ('internal_memo', 'مذكرات داخلية')
+    ], string='نوع المستند', default='all', required=True)
     model = fields.Char(default='archive.management')
 
     # خيارات البحث
@@ -25,6 +35,8 @@ class ArchiveContentSearchWizard(models.TransientModel):
     search_reversed = fields.Boolean('البحث في النص المعكوس', default=True)  # خيار جديد للبحث في النص المعكوس
     use_stemming = fields.Boolean('استخدام جذور الكلمات', default=True)  # إضافة جديدة
     semantic_search = fields.Boolean('بحث دلالي', default=False)  # إضافة جديدة
+
+    # تم إضافة دالة بحث بسيطة للاختبار
 
     def enhanced_arabic_preprocessing(self, text):
         """معالجة متقدمة للنص العربي"""
@@ -57,7 +69,10 @@ class ArchiveContentSearchWizard(models.TransientModel):
             return text if text else ""
 
     def normalize_arabic_text(self, text):
-        """معالجة النص العربي وتوحيد شكل الحروف"""
+        """
+        معالجة النص العربي وتوحيد شكل الحروف
+        مع معالجة متقدمة للتنويعات
+        """
         if not text:
             return ""
 
@@ -65,24 +80,28 @@ class ArchiveContentSearchWizard(models.TransientModel):
             # إزالة التشكيل والحركات
             text = re.sub(r'[\u064B-\u065F\u0670]', '', text)
 
-            # توحيد أشكال الألف
-            text = re.sub(r'[إأآا]', 'ا', text)
+            # توحيد أشكال الألف والهمزات
+            text = re.sub(r'[إأآا]', 'ا', text)  # توحيد الألف
+            text = text.replace('ؤ', 'و')  # توحيد واو الهمزة
+            text = text.replace('ئ', 'ي')  # توحيد ياء الهمزة
+            text = text.replace('ء', '')  # إزالة الهمزة المنفردة
 
-            # توحيد التاء المربوطة والهاء
+            # توحيد التاء المفتوحة والمربوطة
             text = text.replace('ة', 'ه')
 
-            # توحيد الهمزات
-            text = text.replace('ؤ', 'و')
-            text = text.replace('ئ', 'ي')
-            text = text.replace('ء', '')
+            # توحيد واو والياء
+            text = text.replace('ى', 'ي')
+            text = text.replace('و', 'و')
+            text = text.replace('د', 'د')
+            text = text.replace('ذ', 'ذ')
 
-            # إزالة المسافات المتعددة
+            # إزالة المسافات المتعددة والفراغات الزائدة
             text = re.sub(r'\s+', ' ', text)
 
-            return text.strip()
+            return text.strip().lower()  # تحويل للحروف الصغيرة للمطابقة الكاملة
         except Exception as e:
             _logger.error(f"خطأ أثناء معالجة النص العربي: {e}")
-            return text.strip() if text else ""
+            return text.strip().lower() if text else ""
 
     def reverse_text(self, text):
         """عكس ترتيب الكلمات في النص"""
@@ -146,18 +165,40 @@ class ArchiveContentSearchWizard(models.TransientModel):
             # إضافة النص بعد المعالجة المتقدمة
             variations.add(self.enhanced_arabic_preprocessing(word))
 
-            # جذر الكلمة إذا كانت ميزة الجذور مفعلة
+            # معالجة التاء المربوطة - إضافة صيغ بديلة
+            if normalized.endswith('ة'):
+                # إضافة نسخة بدون التاء المربوطة
+                variations.add(normalized[:-1])
+                # إضافة نسخة بهاء بدلاً من التاء المربوطة
+                variations.add(normalized[:-1] + 'ه')
+            elif normalized.endswith('ه'):
+                # إضافة نسخة بتاء مربوطة بدلاً من الهاء
+                variations.add(normalized[:-1] + 'ة')
+            else:
+                # إضافة نسخة مع تاء مربوطة للكلمات العربية التي قد تكون اختصاراً
+                ar_letters = 'ابتثجحخدذرزسشصضطظعغفقكلمنهويءإأآ'
+                if len(normalized) >= 3 and any(c in ar_letters for c in normalized[-3:]):
+                    variations.add(normalized + 'ة')
+                    variations.add(normalized + 'ه')
+
+                    # جذر الكلمة إذا كانت ميزة الجذور مفعلة
             if self.use_stemming:
                 stem = self.get_arabic_stem(normalized)
                 if stem and stem != normalized and len(stem) >= 2:
                     variations.add(stem)
+                    # إضافة صيغ بديلة للجذر أيضاً
+                    if stem.endswith('ة'):
+                        variations.add(stem[:-1])
+                        variations.add(stem[:-1] + 'ه')
+                    elif stem.endswith('ه'):
+                        variations.add(stem[:-1] + 'ة')
 
-                    # الكلمة معكوسة
+                        # الكلمة معكوسة
             if self.search_reversed:
                 variations.add(self.reverse_word(normalized))
 
                 # جذر الكلمة المعكوسة إذا كانت ميزة الجذور مفعلة
-                if self.use_stemming:
+                if self.use_stemming and 'stem' in locals():
                     variations.add(self.reverse_word(stem))
 
                     # إزالة ال التعريف إذا كانت موجودة
@@ -174,7 +215,7 @@ class ArchiveContentSearchWizard(models.TransientModel):
                     variations.add(root)
                     if self.search_reversed:
                         variations.add(self.reverse_word(root))
-                elif normalized.endswith('ه') or normalized.endswith('ت'):
+                elif normalized.endswith('ة') or normalized.endswith('ه') or normalized.endswith('ت'):
                     root = normalized[:-1]
                     variations.add(root)
                     if self.search_reversed:
@@ -413,267 +454,185 @@ class ArchiveContentSearchWizard(models.TransientModel):
             _logger.error(f"خطأ أثناء البحث عن تطابقات في النص: {e}")
             return False
 
-    def action_search(self):
-        self.ensure_one()
-        search_fields = []
 
-        # تحديد حقول البحث
-        if self.search_in_name:
-            search_fields.append('name')
-        if self.search_in_description:
-            search_fields.append('description')
-        if self.search_in_content:
-            search_fields.append('indexed_content_2')
+    def action_view_records(self):
+        """
+        دالة مخصصة لعرض السجلات مع التصفية
+        """
+        # الحصول على السجلات
+        records = self.search([])
 
-        if not search_fields:
-            return {'type': 'ir.actions.act_window_close'}
+        # التصفية باستخدام post_search_filter
+        filtered_records = records.post_search_filter()
 
-            # تقسيم البحث إلى كلمات وإزالة الكلمات الفارغة
-        search_terms = [term for term in self.search_term.split() if term.strip()]
+        # عرض النتائج
+        return {
+            'name': 'السجلات المفلترة',
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', filtered_records.ids)],
+            'target': 'current',
+        }
+
+
+    def post_search_filter(self):
+        """
+        تصفية نتائج البحث للتأكد من:
+        1. وجود جميع كلمات البحث
+        2. تتابع الكلمات
+        3. في نفس السجل
+        """
+        # استخراج كلمات البحث من السياق
+        search_terms = self.env.context.get('advanced_search_terms', [])
+        search_method = self.env.context.get('advanced_search_method', '')
+
+        # التأكد من وجود كلمات البحث وطريقة البحث
+        if not search_terms or search_method != 'strict_sequence_match':
+            return self
+
+            # تصفية السجلات
+        filtered_records = self.env[self._name]
+
+        for record in self:
+            # فحص الحقول المختلفة
+            search_fields = ['name', 'description', 'indexed_content', 'indexed_content_2']
+            record_matched = False
+
+            for field in search_fields:
+                content = getattr(record, field, '')
+                if not content:
+                    continue
+
+                    # تطبيع النص
+                normalized_content = self.env['archive.content.search.wizard'].normalize_arabic_text(content)
+
+                # التحقق من وجود كل الكلمات
+                all_terms_found = all(
+                    self.env['archive.content.search.wizard'].normalize_arabic_text(term) in normalized_content
+                    for term in search_terms
+                )
+
+                # التحقق من وجود الكلمات بالترتيب
+                if all_terms_found:
+                    current_index = 0
+                    terms_in_sequence = True
+
+                    for term in search_terms:
+                        normalized_term = self.env['archive.content.search.wizard'].normalize_arabic_text(term)
+                        term_index = normalized_content.find(normalized_term, current_index)
+
+                        # إذا لم يتم العثور على الكلمة أو وجدت قبل الفهرسة السابقة
+                        if term_index == -1 or term_index < current_index:
+                            terms_in_sequence = False
+                            break
+
+                            # تحديث الفهرسة للبحث عن الكلمة التالية
+                        current_index = term_index + len(normalized_term)
+
+                        # إذا كانت الكلمات متتابعة
+                    if terms_in_sequence:
+                        filtered_records |= record
+                        record_matched = True
+                        break
+
+                        # إذا لم يتم العثور على الكلمات في أي حقل
+            if not record_matched:
+                _logger.info(f"تم استبعاد السجل {record.id} لعدم تطابق كامل")
+
+        return filtered_records
+
+    def action_search_similar(self):
+        """
+        بحث متقدم مع التأكد من:
+        1. وجود جميع الكلمات
+        2. في نفس المستند
+        3. بدون اعتبار الترتيب
+        4. البحث فقط في indexed_content_2
+        5. تصفية حسب التاريخ ونوع المستند
+        """
+        # تقسيم كلمات البحث
+        search_terms = [term.strip() for term in self.search_term.split() if len(term.strip()) > 2]
 
         if not search_terms:
             return {'type': 'ir.actions.act_window_close'}
 
-            # استرجاع جميع السجلات التي قد تحتوي على النص المطلوب
-        model_obj = self.env[self.model]
-
         try:
-            # إنشاء مجال بحث أولي واسع لاسترجاع المرشحين المحتملين
-            domain = []
+            # إنشاء دومين للبحث
+            domain = [
+                ('date', '>=', self.date_from),
+                ('date', '<=', self.date_to)
+            ]
 
-            # إذا كان البحث بسيطًا (غير مرن وبدون خيارات متقدمة)، استخدم البحث التقليدي
-            if not self.fuzzy_search and not self.search_reversed and not self.use_stemming and not self.semantic_search:
-                for field in search_fields:
-                    for term in search_terms:
-                        domain.append((field, 'ilike', term))
+            # إضافة تصفية نوع المستند إذا لم يكن 'الكل'
+            if self.document_type != 'all':
+                domain.append(('document_type', '=', self.document_type))
 
-                        # تطبيق OR بشكل صحيح
-                if len(domain) > 1:
-                    final_domain = ['|'] + domain[:2]
-                    for d in domain[2:]:
-                        final_domain = ['|'] + final_domain + [d]
-                    domain = final_domain
-            else:
-                # للبحث المتقدم، نسترجع مجموعة أوسع من السجلات ثم نصفيها
-                prelim_domain = []
+                # البحث الأولي مع تصفية التاريخ ونوع المستند
+            initial_records = self.env['archive.management'].search(domain)
 
-                # إنشاء مجال أولي للبحث عن أي سجلات تحتوي على أجزاء من مصطلحات البحث
-                for field in search_fields:
-                    field_domain = []
-                    for term in search_terms:
-                        # استخدام أول 3 أحرف من كل كلمة للحصول على نتائج أوسع
-                        if len(term) >= 3:
-                            field_domain.append((field, 'ilike', term[:3]))
+            # باقي الكود كما هو (عملية البحث في المحتوى)
+            filtered_records = self.env['archive.management']
 
-                            # إضافة البحث عن الكلمة المعكوسة أيضًا
-                            if self.search_reversed:
-                                reversed_term = self.reverse_word(term)
-                                if len(reversed_term) >= 3:
-                                    field_domain.append((field, 'ilike', reversed_term[:3]))
+            for record in initial_records:
+                # مصفوفة للتتبع
+                terms_found = [False] * len(search_terms)
 
-                                    # إضافة البحث عن جذر الكلمة
-                            if self.use_stemming:
-                                stem = self.get_arabic_stem(term)
-                                if stem and len(stem) >= 3 and stem != term[:3]:
-                                    field_domain.append((field, 'ilike', stem[:3]))
+                # فحص حقل indexed_content_2
+                content = record.indexed_content_2
+                if not content:
+                    continue
 
-                                    # وجذر الكلمة المعكوسة أيضًا
-                                    if self.search_reversed:
-                                        reversed_stem = self.reverse_word(stem)
-                                        if len(reversed_stem) >= 3:
-                                            field_domain.append((field, 'ilike', reversed_stem[:3]))
+                    # تطبيع محتوى الحقل
+                normalized_content = self.normalize_arabic_text(content)
 
-                                            # تطبيق OR على كل حقل
-                    if field_domain:
-                        if len(field_domain) > 1:
-                            field_or_domain = ['|'] + field_domain[:2]
-                            for d in field_domain[2:]:
-                                field_or_domain = ['|'] + field_or_domain + [d]
-                            prelim_domain.append(field_or_domain)
-                        else:
-                            prelim_domain.append(field_domain[0])
+                # التحقق من وجود كل الكلمات
+                for i, term in enumerate(search_terms):
+                    normalized_term = self.normalize_arabic_text(term)
+                    if normalized_term in normalized_content:
+                        terms_found[i] = True
 
-                            # تطبيق OR بين الحقول
-                if len(prelim_domain) > 1:
-                    domain = ['|'] + prelim_domain[:2]
-                    for d in prelim_domain[2:]:
-                        domain = ['|'] + domain + [d]
-                elif len(prelim_domain) == 1:
-                    domain = prelim_domain
-                else:
-                    # إذا لم يتم إنشاء مجال، استخدم مجال عام للحصول على جميع السجلات التي تحتوي على محتوى
-                    for field in search_fields:
-                        domain.append((field, '!=', False))
+                        # التأكد من وجود كل الكلمات
+                if all(terms_found):
+                    filtered_records |= record
 
-                    if len(search_fields) > 1:
-                        domain = ['|'] * (len(search_fields) - 1) + domain
-
-                        # استرجاع السجلات المرشحة
-            _logger.info(f"مجال البحث الأولي: {domain}")
-            records = model_obj.search(domain)
-            _logger.info(f"تم العثور على {len(records)} سجل مرشح للبحث")
-
-            # تصفية النتائج باستخدام الخوارزمية المخصصة للبحث
-            matching_ids = []
-            matched_fields = {}  # لتتبع الحقول التي تحتوي على تطابق
-
-            for record in records:
-                matched = False
-                record_matched_fields = []
-
-                for field in search_fields:
-                    field_value = getattr(record, field, '')
-                    if not field_value:
-                        continue
-
-                        # تحويل القيمة إلى نص
-                    field_value = str(field_value)
-
-                    # البحث عن التطابق باستخدام الخوارزمية المحسنة
-                    if self.find_matches_in_text(field_value, search_terms):
-                        matched = True
-                        record_matched_fields.append(field)
-
-                if matched:
-                    matching_ids.append(record.id)
-                    matched_fields[record.id] = record_matched_fields
-
-            _logger.info(f"تم العثور على {len(matching_ids)} سجل مطابق بعد التصفية")
-
-            # إنشاء مجال نهائي باستخدام الهويات المطابقة
-            final_domain = [('id', 'in', matching_ids)]
-
-            # إذا لم يتم العثور على نتائج، عرض رسالة للمستخدم
-            if not matching_ids:
+                    # إذا لم توجد نتائج
+            if not filtered_records:
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',
                     'params': {
-                        'title': 'لا توجد نتائج',
-                        'message': f'لم يتم العثور على أي مستند يطابق البحث: {self.search_term}',
+                        'title': 'نتائج البحث',
+                        'message': 'لم يتم العثور على مستندات مطابقة للبحث',
                         'sticky': False,
-                        'type': 'warning',
+                        'type': 'warning'
                     }
                 }
 
-                # عرض نتائج البحث
-            return {
-                'name': f'نتائج البحث: {self.search_term} ({len(matching_ids)})',
-                'type': 'ir.actions.act_window',
-                'res_model': self.model,
-                'view_mode': 'list,form',
-                'domain': final_domain,
-                'context': {
-                    'search_default_active': 1,
-                    'search_term': self.search_term,
-                    'matched_fields': matched_fields,
-                },
-                'target': 'current',
-            }
-        except Exception as e:
-            _logger.error(f"خطأ أثناء عملية البحث: {e}")
-            # في حالة حدوث خطأ، نعرض رسالة ونغلق النافذة
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': 'خطأ في البحث',
-                    'message': f'حدث خطأ أثناء عملية البحث: {e}',
-                    'sticky': False,
-                    'type': 'danger',
-                }
-            }
-
-    def action_search_similar(self):
-        """البحث عن مستندات مشابهة"""
-        self.ensure_one()
-        search_fields = []
-
-        # تحديد حقول البحث
-        if self.search_in_name:
-            search_fields.append('name')
-        if self.search_in_description:
-            search_fields.append('description')
-        if self.search_in_content:
-            search_fields.append('indexed_content_2')
-
-        if not search_fields:
-            return {'type': 'ir.actions.act_window_close'}
-
-            # تقسيم البحث إلى كلمات وإزالة الكلمات الفارغة والقصيرة جدًا
-        search_terms = [term for term in self.search_term.split() if len(term.strip()) > 2]
-
-        if not search_terms:
-            return {'type': 'ir.actions.act_window_close'}
-
-        try:
-            # استخدام منطق مختلف للبحث عن مستندات مشابهة - البحث عن أي كلمة من كلمات البحث
-            model_obj = self.env[self.model]
-
-            # بناء مجال للبحث عن أي كلمة من كلمات البحث
-            domain = []
-
-            # للبحث عن مستندات مشابهة، نبحث عن أي كلمة من كلمات البحث
-            for field in search_fields:
-                for term in search_terms:
-                    normalized_term = self.normalize_arabic_text(term)
-                    if len(normalized_term) >= 3:
-                        # البحث عن الكلمة العادية
-                        domain.append((field, 'ilike', normalized_term))
-
-                        # البحث عن جذر الكلمة إذا كانت طويلة بما يكفي
-                        if len(normalized_term) > 4:
-                            domain.append((field, 'ilike', normalized_term[:-1]))  # بدون الحرف الأخير
-
-                        # البحث عن جذر الكلمة إذا كانت ميزة الجذور مفعلة
-                        if self.use_stemming:
-                            stem = self.get_arabic_stem(normalized_term)
-                            if stem and stem != normalized_term and len(stem) >= 3:
-                                domain.append((field, 'ilike', stem))
-
-                                # البحث عن الكلمة المعكوسة
-                        if self.search_reversed:
-                            reversed_term = self.reverse_word(normalized_term)
-                            domain.append((field, 'ilike', reversed_term))
-
-                            # بحث عن جذر الكلمة المعكوسة
-                            if self.use_stemming:
-                                reversed_stem = self.reverse_word(stem) if stem else ""
-                                if reversed_stem and len(reversed_stem) >= 3:
-                                    domain.append((field, 'ilike', reversed_stem))
-
-                                    # تطبيق OR بشكل صحيح
-            if len(domain) > 1:
-                final_domain = ['|'] + domain[:2]
-                for d in domain[2:]:
-                    final_domain = ['|'] + final_domain + [d]
-                domain = final_domain
-
-            if not domain:
-                return {'type': 'ir.actions.act_window_close'}
-
-            _logger.info(f"مجال البحث للمستندات المشابهة: {domain}")
-
-            # عرض نتائج البحث
+                # عرض النتائج
             return {
                 'name': f'مستندات مشابهة لـ: {self.search_term}',
                 'type': 'ir.actions.act_window',
-                'res_model': self.model,
+                'res_model': 'archive.management',
                 'view_mode': 'list,form',
-                'domain': domain,
-                'context': {'search_default_active': 1},
+                'domain': [('id', 'in', filtered_records.ids)],
                 'target': 'current',
+                'context': {
+                    'search_default_date_range': 1,
+                    'date_from': self.date_from,
+                    'date_to': self.date_to
+                }
             }
+
         except Exception as e:
-            _logger.error(f"خطأ أثناء البحث عن مستندات مشابهة: {e}")
-            # في حالة حدوث خطأ، نعرض رسالة ونغلق النافذة
+            _logger.error(f"خطأ أثناء البحث: {e}")
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
                     'title': 'خطأ في البحث',
-                    'message': f'حدث خطأ أثناء البحث عن مستندات مشابهة: {e}',
+                    'message': f'حدث خطأ أثناء البحث: {e}',
                     'sticky': False,
-                    'type': 'danger',
+                    'type': 'danger'
                 }
             }

@@ -1,82 +1,273 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- نموذج البحث المتقدم في النص -->
-    <record id="view_archive_content_search_wizard_form" model="ir.ui.view">
+    <!-- نموذج البحث المتقدم في النص - تبقى كما هي -->
+
+<record id="view_archive_content_search_wizard_form" model="ir.ui.view">
         <field name="name">archive.content.search.wizard.form</field>
         <field name="model">archive.content.search.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <group>
-                        <field name="search_term" placeholder="أدخل نص البحث هنا..." autofocus="1"/>
-                        <field name="model" invisible="1"/>
-                    </group>
+                    <!-- عنوان وشعار البحث -->
+                    <div class="oe_title mb-3">
+                        <h2>
+                            <span title="بحث متقدم">
+                                <i class="fa fa-search text-primary me-2" title="أيقونة البحث"/>
+                                البحث المتقدم في الأرشيف
+                            </span>
+                        </h2>
+                    </div>
 
-                    <group string="خيارات البحث">
-                        <group string="نطاق البحث">
-                            <field name="search_in_name"/>
-                            <field name="search_in_description"/>
-                            <field name="search_in_content"/>
-                        </group>
-                        <group string="خيارات متقدمة">
-                            <field name="search_reversed" string="البحث في النص المعكوس"/>
-                            <field name="use_stemming" string="استخدام جذور الكلمات"/>
-                            <field name="semantic_search" string="بحث دلالي"/>
-                        </group>
-                    </group>
+                    <!-- مربع البحث الرئيسي -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <field name="search_term"
+                                   placeholder="أدخل كلمات البحث هنا..."
+                                   class="form-control text-right"/>
+                        </div>
+                    </div>
 
-                    <group string="إعدادات الدقة">
-                        <group>
-                            <field name="case_sensitive"/>
-                            <field name="whole_word"/>
-                        </group>
-                        <group>
-                            <field name="fuzzy_search" string="بحث مرن (أخطاء إملائية)"/>
-                            <field name="fuzzy_threshold" string="درجة التشابه (1-5)" invisible="not fuzzy_search"/>
-                        </group>
-                    </group>
+                    <!-- نطاق التاريخ ونوع المستند -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <strong>
+                                        <span title="نطاق التاريخ">
+                                            <i class="fa fa-calendar text-primary me-2" title="تقويم"/>
+                                            نطاق التاريخ
+                                        </span>
+                                    </strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label for="date_from">من تاريخ</label>
+                                            <field name="date_from"
+                                                   id="date_from"
+                                                   class="form-control"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <label for="date_to">إلى تاريخ</label>
+                                            <field name="date_to"
+                                                   id="date_to"
+                                                   class="form-control"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <strong>
+                                        <span title="نوع المستند">
+                                            <i class="fa fa-file-text text-primary me-2" title="مستند"/>
+                                            نوع المستند
+                                        </span>
+                                    </strong>
+                                </div>
+                                <div class="card-body">
+                                    <field name="document_type"
+                                           widget="radio"
+                                           nolabel="1"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div class="alert alert-info" role="alert">
-                        <h4><i class="fa fa-info-circle" title="معلومات"></i> إرشادات البحث</h4>
-                        <ul>
-                            <li><b>البحث في النص المعكوس:</b> يساعد في العثور على النصوص المستخرجة بشكل معكوس من ملفات PDF.</li>
-                            <li><b>استخدام جذور الكلمات:</b> يبحث عن أشكال مختلفة من الكلمات (مثل: ميناء، الميناء، موانئ).</li>
-                            <li><b>البحث الدلالي:</b> يبحث عن المعنى وليس فقط عن الكلمات المحددة.</li>
-                            <li><b>البحث المرن:</b> يسمح بإيجاد النتائج حتى مع وجود أخطاء إملائية أو تبادل في ترتيب الحروف.</li>
-                            <li><b>درجة التشابه:</b> رقم أقل (1-2) للنتائج الأكثر شمولاً، رقم أعلى (4-5) للنتائج الأكثر دقة.</li>
-                        </ul>
-                        <p class="mt-2"><i class="fa fa-lightbulb-o" title="نصيحة"></i> <b>نصيحة:</b> للبحث في النصوص المعكوسة، استخدم كلمات مميزة وفعّل "البحث في النص المعكوس" وقم بضبط درجة التشابه على قيمة منخفضة (1 أو 2).</p>
+                    <!-- خيارات البحث المتقدمة -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <strong>
+                                        <span title="نطاق البحث">
+                                            <i class="fa fa-search-plus text-primary me-2" title="بحث متقدم"/>
+                                            نطاق البحث
+                                        </span>
+                                    </strong>
+                                </div>
+                                <div class="card-body">
+                                    <div>
+                                        <field name="search_in_name" id="search_in_name"/>
+                                        <label for="search_in_name" class="ms-2">البحث في الاسم</label>
+                                    </div>
+                                    <div>
+                                        <field name="search_in_description" id="search_in_description"/>
+                                        <label for="search_in_description" class="ms-2">البحث في الوصف</label>
+                                    </div>
+                                    <div>
+                                        <field name="search_in_content" id="search_in_content"/>
+                                        <label for="search_in_content" class="ms-2">البحث في المحتوى</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <strong>
+                                        <span title="خيارات متقدمة">
+                                            <i class="fa fa-cogs text-primary me-2" title="إعدادات"/>
+                                            خيارات متقدمة
+                                        </span>
+                                    </strong>
+                                </div>
+                                <div class="card-body">
+                                    <div>
+                                        <field name="search_reversed" id="search_reversed"/>
+                                        <label for="search_reversed" class="ms-2">البحث في النص المعكوس</label>
+                                    </div>
+                                    <div>
+                                        <field name="use_stemming" id="use_stemming"/>
+                                        <label for="use_stemming" class="ms-2">استخدام جذور الكلمات</label>
+                                    </div>
+                                    <div>
+                                        <field name="semantic_search" id="semantic_search"/>
+                                        <label for="semantic_search" class="ms-2">بحث دلالي</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- إعدادات الدقة -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <strong>
+                                        <span title="إعدادات الدقة">
+                                            <i class="fa fa-sliders text-primary me-2" title="إعدادات"/>
+                                            إعدادات الدقة
+                                        </span>
+                                    </strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div>
+                                                <field name="case_sensitive" id="case_sensitive"/>
+                                                <label for="case_sensitive" class="ms-2">حساسية الأحرف</label>
+                                            </div>
+                                            <div>
+                                                <field name="whole_word" id="whole_word"/>
+                                                <label for="whole_word" class="ms-2">كلمة كاملة</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div>
+                                                <field name="fuzzy_search" id="fuzzy_search"/>
+                                                <label for="fuzzy_search" class="ms-2">بحث مرن (أخطاء إملائية)</label>
+                                            </div>
+                                            <field name="fuzzy_threshold"
+                                                   id="fuzzy_threshold"
+                                                   class="form-control mt-2"
+                                                   placeholder="درجة التشابه (1-5)"
+                                                   invisible="not fuzzy_search"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- مربع المساعدة والإرشادات -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-info text-white">
+                            <strong>
+                                <span title="إرشادات البحث الذكي">
+                                    <i class="fa fa-info-circle me-2" title="معلومات"/>
+                                    إرشادات البحث الذكي
+                                </span>
+                            </strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div role="status" class="alert alert-primary">
+                                        <h5 class="alert-heading">
+                                            <span title="البحث في النص المعكوس">
+                                                <i class="fa fa-file-pdf-o me-2" title="PDF"/>
+                                                البحث في النص المعكوس
+                                            </span>
+                                        </h5>
+                                        <p>يساعد في العثور على النصوص المستخرجة بشكل معكوس من ملفات PDF</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div role="status" class="alert alert-success">
+                                        <h5 class="alert-heading">
+                                            <span title="استخدام جذور الكلمات">
+                                                <i class="fa fa-language me-2" title="لغة"/>
+                                                استخدام جذور الكلمات
+                                            </span>
+                                        </h5>
+                                        <p>يبحث عن أشكال مختلفة من الكلمات (مثل: ميناء، الميناء، موانئ)</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div role="status" class="alert alert-warning">
+                                        <h5 class="alert-heading">
+                                            <span title="البحث الدلالي">
+                                                <i class="fa fa-brain me-2" title="ذكاء"/>
+                                                البحث الدلالي
+                                            </span>
+                                        </h5>
+                                        <p>يبحث عن المعنى وليس فقط عن الكلمات المحددة</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </sheet>
+
+                <!-- أزرار التذييل -->
                 <footer>
-                    <button name="action_search" string="بحث" type="object" class="btn-primary"/>
-                    <button name="action_search_similar" string="بحث عن مستندات مشابهة" type="object" class="btn-secondary"/>
-                    <button string="إلغاء" class="btn-secondary" special="cancel"/>
+                    <button name="action_search_similar"
+                            type="object"
+                            class="btn btn-primary">
+                        بحث متقدم
+                    </button>
+                    <button special="cancel"
+                            class="btn btn-secondary">
+                        إلغاء
+                    </button>
                 </footer>
             </form>
         </field>
     </record>
-
-    <!-- نتائج البحث (عرض مخصص للنتائج) -->
+    <!-- نتائج البحث (عرض مخصص للنتائج) - تبقى كما هي -->
     <record id="view_archive_search_results_list" model="ir.ui.view">
-        <field name="name">archive.management.search.results.list</field>
-        <field name="model">archive.management</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="name"/>
-                <field name="reference"/>
-                <field name="document_type"/>
-                <field name="date"/>
-                <field name="category_id"/>
-                <field name="sent_by"/>
-                <field name="directed_to"/>
-                <field name="state"/>
-                <field name="attachment_id" widget="boolean" string="PDF"/>
-            </list>
-        </field>
-    </record>
+    <field name="name">archive.management.search.results.list</field>
+    <field name="model">archive.management</field>
+    <field name="arch" type="xml">
+        <list decoration-success="document_type == 'internal_memo'"
+              decoration-warning="document_type == 'incoming'"
+              decoration-info="document_type == 'outgoing'"
+              decoration-danger="document_type == 'confidential'">
+            <field name="name" string="اسم المستند" />
+            <field name="reference" string="المرجع" />
+            <field name="document_type" string="نوع المستند" />
+            <field name="date" string="التاريخ" />
+            <field name="category_id" string="الفئة" />
+            <field name="sent_by" string="المرسل" />
+            <field name="directed_to" string="الموجه إليه" />
+            <field name="state" string="الحالة" />
+            <field name="attachment_id" widget="boolean" string="مرفق PDF" />
 
-    <!-- إجراء فتح مساعد البحث -->
+            <!-- إضافة أعمدة مخصصة -->
+            <field name="create_date" string="تاريخ الإنشاء" optional="hide"/>
+            <field name="create_uid" string="أنشأ بواسطة" optional="hide"/>
+
+            <!-- مؤشرات مرئية -->
+            <field name="tag_ids" widget="many2many_tags" string="العلامات" optional="show"/>
+        </list>
+    </field>
+</record>
+
+    <!-- إجراء فتح مساعد البحث - تبقى كما هي -->
     <record id="action_archive_content_search" model="ir.actions.act_window">
         <field name="name">بحث متقدم في المحتوى</field>
         <field name="res_model">archive.content.search.wizard</field>
@@ -90,7 +281,7 @@
         </field>
     </record>
 
-    <!-- إجراء لعرض نتائج البحث -->
+    <!-- إجراء لعرض نتائج البحث - تبقى كما هي -->
     <record id="action_archive_search_results" model="ir.actions.act_window">
         <field name="name">نتائج البحث</field>
         <field name="res_model">archive.management</field>
@@ -101,27 +292,27 @@
         <field name="context">{'search_default_active': 1}</field>
     </record>
 
-    <!-- عنصر القائمة للوصول المباشر للبحث المتقدم -->
+    <!-- هنا نعدل الـ parent من menu_archive_management إلى menu_archive_search_root -->
     <menuitem id="menu_archive_content_search"
               name="بحث متقدم"
-              parent="menu_archive_management"
+              parent="menu_archive_search_root"
               action="action_archive_content_search"
-              sequence="50"/>
+              sequence="10"/>
 
-    <!-- زر شريط الأدوات للبحث السريع -->
+    <!-- زر شريط الأدوات للبحث السريع - تبقى كما هي -->
     <record id="action_archive_quick_search" model="ir.actions.client">
         <field name="name">بحث سريع</field>
         <field name="tag">archive_quick_search</field>
     </record>
 
-    <!-- عنصر القائمة لعرض نتائج البحث الأخيرة -->
+    <!-- هنا نعدل الـ parent من menu_archive_management إلى menu_archive_search_root -->
     <menuitem id="menu_archive_recent_searches"
               name="نتائج البحث الأخيرة"
-              parent="menu_archive_management"
+              parent="menu_archive_search_root"
               action="action_archive_search_results"
-              sequence="51"/>
+              sequence="20"/>
 
-    <!-- تعريف التسلسل -->
+    <!-- تعريف التسلسل - تبقى كما هي -->
     <record id="sequence_archive_search_log" model="ir.sequence">
         <field name="name">سجل البحث في الأرشيف</field>
         <field name="code">archive.search.log</field>

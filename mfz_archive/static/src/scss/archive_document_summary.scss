@@ -1,0 +1,55 @@
+/* تنسيقات عرض تفاصيل المستند */
+.o_archive_management_summary {
+    direction: rtl;
+
+    .archive_document_header {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+        h4, h5 {
+            font-weight: 600;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+            padding: 5px 8px;
+        }
+    }
+
+    .archive_summary_tabs {
+        .table {
+            th {
+                font-weight: 600;
+                background-color: #f8f9fa;
+            }
+
+            td, th {
+                padding: 8px 10px;
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
+.archive_document_details {
+    border-top: 1px solid #dee2e6;
+    padding-top: 15px;
+
+    h4 {
+        color: #4c4c4c;
+        font-weight: 600;
+    }
+}
+
+/* تحسين تنسيق الجداول في العرض العام */
+.o_list_view, .o_form_view {
+    &.o_rtl {
+        direction: rtl;
+        text-align: right;
+
+        .o_list_table {
+            th, td {
+                text-align: right;
+            }
+        }
+    }
+}

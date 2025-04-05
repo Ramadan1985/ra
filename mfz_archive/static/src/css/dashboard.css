@@ -1,0 +1,332 @@
+/* تنسيق خاص بموديول الأرشيف فقط */
+.o_mfz_archive_view .dashboard-container,
+.mfz_archive_dashboard .dashboard-container,
+.archive_dashboard_container {
+    direction: rtl;
+    text-align: right;
+    padding: 20px;
+    background-color: #f8f9fc;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* تنسيق بطاقات الإحصائيات */
+.o_mfz_archive_view .stats-card,
+.mfz_archive_dashboard .stats-card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    height: 100%;
+}
+
+.o_mfz_archive_view .stats-card::before,
+.mfz_archive_dashboard .stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: -1;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s ease;
+}
+
+.o_mfz_archive_view .stats-card:hover,
+.mfz_archive_dashboard .stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.o_mfz_archive_view .stats-card:hover::before,
+.mfz_archive_dashboard .stats-card:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.o_mfz_archive_view .stats-card i,
+.mfz_archive_dashboard .stats-card i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    opacity: 0.8;
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.o_mfz_archive_view .stats-card .card-content,
+.mfz_archive_dashboard .stats-card .card-content {
+    padding: 20px;
+    padding-right: 20px; /* للدعم العربي RTL */
+    text-align: right;
+}
+
+.o_mfz_archive_view .stats-card .card-title,
+.mfz_archive_dashboard .stats-card .card-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.o_mfz_archive_view .stats-card .card-value,
+.mfz_archive_dashboard .stats-card .card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+}
+
+/* التدرجات اللونية للبطاقات */
+.o_mfz_archive_view .bg-primary-gradient,
+.mfz_archive_dashboard .bg-primary-gradient {
+    background: linear-gradient(180deg, #4e73df 0%, #2e59d9 100%);
+    color: white;
+}
+
+.o_mfz_archive_view .bg-success-gradient,
+.mfz_archive_dashboard .bg-success-gradient {
+    background: linear-gradient(180deg, #1cc88a 0%, #13855c 100%);
+    color: white;
+}
+
+.o_mfz_archive_view .bg-info-gradient,
+.mfz_archive_dashboard .bg-info-gradient {
+    background: linear-gradient(180deg, #36b9cc 0%, #258391 100%);
+    color: white;
+}
+
+.o_mfz_archive_view .bg-warning-gradient,
+.mfz_archive_dashboard .bg-warning-gradient {
+    background: linear-gradient(180deg, #f6c23e 0%, #dda20a 100%);
+    color: white;
+}
+
+/* تنسيق بطاقات المخططات */
+.o_mfz_archive_view .dashboard-category-card,
+.mfz_archive_dashboard .dashboard-category-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    overflow: hidden;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.o_mfz_archive_view .dashboard-category-card:hover,
+.mfz_archive_dashboard .dashboard-category-card:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.o_mfz_archive_view .dashboard-category-card .card-header,
+.mfz_archive_dashboard .dashboard-category-card .card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    padding: 15px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.o_mfz_archive_view .dashboard-category-card .card-header::before,
+.mfz_archive_dashboard .dashboard-category-card .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    background-color: #4e73df;
+}
+
+.o_mfz_archive_view .dashboard-category-card .card-header h6,
+.mfz_archive_dashboard .dashboard-category-card .card-header h6 {
+    color: #2e59d9;
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.o_mfz_archive_view .dashboard-category-card .card-header h6::before,
+.mfz_archive_dashboard .dashboard-category-card .card-header h6::before {
+    content: '\f080'; /* رمز Font Awesome */
+    font-family: 'FontAwesome';
+    margin-left: 8px;
+    color: #4e73df;
+}
+
+.o_mfz_archive_view .dashboard-category-card .card-body,
+.mfz_archive_dashboard .dashboard-category-card .card-body {
+    padding: 20px;
+}
+
+/* تنسيق حاويات المخططات */
+.o_mfz_archive_view .chart-container,
+.mfz_archive_dashboard .chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+}
+
+/* إضافة نمط للمؤشرات */
+.o_mfz_archive_view .stat-indicator,
+.mfz_archive_dashboard .stat-indicator {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.o_mfz_archive_view .stat-indicator.up,
+.mfz_archive_dashboard .stat-indicator.up {
+    color: #1cc88a;
+}
+
+.o_mfz_archive_view .stat-indicator.down,
+.mfz_archive_dashboard .stat-indicator.down {
+    color: #e74a3b;
+}
+
+.o_mfz_archive_view .stat-indicator i,
+.mfz_archive_dashboard .stat-indicator i {
+    margin-left: 5px;
+}
+
+/* تعديلات Bootstrap للتوافق مع RTL - محددة بالنطاق */
+.o_mfz_archive_view .row,
+.mfz_archive_dashboard .row {
+    width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.o_mfz_archive_view .col-md-3, .o_mfz_archive_view .col-md-6, .o_mfz_archive_view .col-sm-6, .o_mfz_archive_view .col-12,
+.mfz_archive_dashboard .col-md-3, .mfz_archive_dashboard .col-md-6, .mfz_archive_dashboard .col-sm-6, .mfz_archive_dashboard .col-12 {
+    float: right;
+}
+
+/* إصلاح الفراغ على اليسار - محدد بالنطاق */
+.o_mfz_archive_view .o_dashboard_view,
+.mfz_archive_dashboard .o_dashboard_view {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.o_mfz_archive_view .o_dashboard_view .o_kanban_record,
+.mfz_archive_dashboard .o_dashboard_view .o_kanban_record {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* إصلاح مشكلة عرض لوحة المعلومات بشكل جذري - محدد بالنطاق */
+.o_mfz_archive_view .o_view_controller,
+.o_mfz_archive_view .o_kanban_view,
+.o_mfz_archive_view .o_content,
+.o_mfz_archive_view .o_kanban_renderer,
+.o_mfz_archive_view .o_dashboard_view,
+.o_mfz_archive_view .o_kanban_record,
+.o_mfz_archive_view .o_view_controller > div,
+.mfz_archive_dashboard .o_view_controller,
+.mfz_archive_dashboard .o_kanban_view,
+.mfz_archive_dashboard .o_content,
+.mfz_archive_dashboard .o_kanban_renderer,
+.mfz_archive_dashboard .o_dashboard_view,
+.mfz_archive_dashboard .o_kanban_record,
+.mfz_archive_dashboard .o_view_controller > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* إصلاح عرض المخططات في المتصفحات المختلفة - محدد بالنطاق */
+.o_mfz_archive_view canvas.type-chart,
+.o_mfz_archive_view canvas.state-chart,
+.o_mfz_archive_view canvas.trend-chart,
+.mfz_archive_dashboard canvas.type-chart,
+.mfz_archive_dashboard canvas.state-chart,
+.mfz_archive_dashboard canvas.trend-chart {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* تحسين التوافقية مع الأجهزة المحمولة - محدد بالنطاق */
+@media (max-width: 992px) {
+    .o_mfz_archive_view .dashboard-container,
+    .mfz_archive_dashboard .dashboard-container {
+        padding: 15px;
+    }
+
+    .o_mfz_archive_view .row,
+    .mfz_archive_dashboard .row {
+        flex-direction: column;
+    }
+
+    .o_mfz_archive_view .col-md-3, .o_mfz_archive_view .col-md-6,
+    .mfz_archive_dashboard .col-md-3, .mfz_archive_dashboard .col-md-6 {
+        width: 100%;
+        max-width: 100%;
+        flex: 0 0 100%;
+        margin-bottom: 15px;
+    }
+
+    .o_mfz_archive_view .stats-card,
+    .mfz_archive_dashboard .stats-card {
+        display: flex;
+        align-items: center;
+    }
+
+    .o_mfz_archive_view .stats-card i,
+    .mfz_archive_dashboard .stats-card i {
+        position: static;
+        transform: none;
+        margin-left: 15px;
+    }
+
+    .o_mfz_archive_view .stats-card .card-content,
+    .mfz_archive_dashboard .stats-card .card-content {
+        flex: 1;
+    }
+
+    .o_mfz_archive_view .chart-container,
+    .mfz_archive_dashboard .chart-container {
+        height: 200px;
+    }
+}
+
+@media (max-width: 576px) {
+    .o_mfz_archive_view .dashboard-container,
+    .mfz_archive_dashboard .dashboard-container {
+        padding: 10px;
+    }
+
+    .o_mfz_archive_view .stats-card .card-value,
+    .mfz_archive_dashboard .stats-card .card-value {
+        font-size: 20px;
+    }
+
+    .o_mfz_archive_view .chart-container,
+    .mfz_archive_dashboard .chart-container {
+        height: 180px;
+    }
+
+    .o_mfz_archive_view .dashboard-category-card .card-header h6,
+    .mfz_archive_dashboard .dashboard-category-card .card-header h6 {
+        font-size: 14px;
+    }
+}

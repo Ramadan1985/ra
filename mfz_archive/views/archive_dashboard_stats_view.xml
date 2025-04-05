@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_archive_dashboard_stats_kanban" model="ir.ui.view">
+        <field name="name">archive.dashboard.stats.kanban</field>
+        <field name="model">archive.dashboard.stats</field>
+        <field name="arch" type="xml">
+            <kanban create="false" class="o_dashboard_kanban">
+                <field name="id"/>
+                <field name="total_documents"/>
+                <field name="incoming_count"/>
+                <field name="outgoing_count"/>
+                <field name="memo_count"/>
+                <field name="pending_count"/>
+                <field name="approved_count"/>
+                <field name="rejected_count"/>
+                <field name="processing_time_avg"/>
+                <field name="this_month_count"/>
+                <field name="last_month_count"/>
+                <field name="efficiency_rate"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="container-fluid px-2 py-3">
+                            <!-- الصف الأول: الإحصائيات الرئيسية -->
+                            <div class="row g-3 mb-3">
+                                <!-- إجمالي المستندات -->
+                                <div class="col-6 col-lg-3">
+                                    <div class="dashboard-stat-card bg-white shadow-sm rounded">
+                                        <div class="d-flex align-items-center">
+                                            <div class="dashboard-stat-icon bg-primary-light rounded-circle me-3">
+                                                <i class="fa fa-file-lines text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-primary fs-4 total_documents">
+                                                    <t t-esc="record.total_documents.value"/>
+                                                </div>
+                                                <div class="text-muted small">إجمالي المستندات</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- معدل الكفاءة -->
+                                <div class="col-6 col-lg-3">
+                                    <div class="dashboard-stat-card bg-white shadow-sm rounded">
+                                        <div class="d-flex align-items-center">
+                                            <div class="dashboard-stat-icon bg-success-light rounded-circle me-3">
+                                                <i class="fa fa-gauge-high text-success"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-success fs-4 efficiency_rate">
+                                                    <t t-esc="Math.round(record.efficiency_rate.raw_value * 100) / 100"/>%
+                                                </div>
+                                                <div class="text-muted small">معدل الكفاءة</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- متوسط أيام المعالجة -->
+                                <div class="col-6 col-lg-3">
+                                    <div class="dashboard-stat-card bg-white shadow-sm rounded">
+                                        <div class="d-flex align-items-center">
+                                            <div class="dashboard-stat-icon bg-info-light rounded-circle me-3">
+                                                <i class="fa fa-clock text-info"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-info fs-4">
+                                                    <t t-esc="Math.round(record.processing_time_avg.raw_value * 10) / 10"/>
+                                                </div>
+                                                <div class="text-muted small">أيام المعالجة</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- مستندات الشهر الحالي -->
+                                <div class="col-6 col-lg-3">
+                                    <div class="dashboard-stat-card bg-white shadow-sm rounded">
+                                        <div class="d-flex align-items-center">
+                                            <div class="dashboard-stat-icon bg-warning-light rounded-circle me-3">
+                                                <i class="fa fa-calendar-days text-warning"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-warning fs-4">
+                                                    <t t-esc="record.this_month_count.value"/>
+                                                </div>
+                                                <div class="text-muted small">الشهر الحالي</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- الصف الثاني: مقاييس -->
+                            <div class="row g-3 mb-3">
+                                <!-- مقياس كفاءة المعالجة -->
+                                <div class="col-12">
+                                    <div class="dashboard-gauge-card bg-white shadow-sm rounded">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="dashboard-stat-icon bg-primary-light rounded-circle me-2">
+                                                <i class="fa fa-chart-simple text-primary"></i>
+                                            </div>
+                                            <h6 class="mb-0 ms-2">كفاءة المعالجة</h6>
+                                        </div>
+                                        <!-- تغيير: إضافة div مع معرف لمقياس الكفاءة -->
+                                        <div class="gauge-container" style="height: 20px; background-color: #e9ecef; border-radius: 4px;">
+                                            <div t-att-id="'efficiency-gauge-' + record.id.raw_value" style="height: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- الصف الثالث: التصنيفات -->
+                            <div class="row g-3">
+                                <!-- المستندات حسب النوع -->
+                                <div class="col-md-6 mb-2">
+                                    <div class="dashboard-category-card bg-white shadow-sm rounded">
+                                        <div class="dashboard-card-header d-flex align-items-center">
+                                            <div class="dashboard-header-icon bg-primary-light rounded-circle me-2">
+                                                <i class="fa fa-layer-group text-primary"></i>
+                                            </div>
+                                            <h6 class="mb-0">حسب النوع</h6>
+                                        </div>
+                                        <div class="dashboard-card-body">
+                                            <div class="row text-center g-2">
+                                                <div class="col-4">
+                                                    <div class="category-item">
+                                                        <div class="category-icon bg-primary-light mb-2">
+                                                            <i class="fa fa-inbox text-primary"></i>
+                                                        </div>
+                                                        <div class="fw-bold text-primary incoming_count">
+                                                            <t t-esc="record.incoming_count.value"/>
+                                                        </div>
+                                                        <div class="text-muted small">واردة</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="category-item">
+                                                        <div class="category-icon bg-success-light mb-2">
+                                                            <i class="fa fa-paper-plane text-success"></i>
+                                                        </div>
+                                                        <div class="fw-bold text-success outgoing_count">
+                                                            <t t-esc="record.outgoing_count.value"/>
+                                                        </div>
+                                                        <div class="text-muted small">صادرة</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="category-item">
+                                                        <div class="category-icon bg-secondary-light mb-2">
+                                                            <i class="fa fa-note-sticky text-secondary"></i>
+                                                        </div>
+                                                        <div class="fw-bold text-secondary memo_count">
+                                                            <t t-esc="record.memo_count.value"/>
+                                                        </div>
+                                                        <div class="text-muted small">مذكرات</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- تغيير: إضافة عنصر canvas داخل div -->
+                                            <div class="mt-2 chart-container" style="height: 150px;">
+                                                <canvas t-att-id="'type-chart-' + record.id.raw_value"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- المستندات حسب الحالة -->
+                                <div class="col-md-6 mb-2">
+                                    <div class="dashboard-category-card bg-white shadow-sm rounded">
+                                        <div class="dashboard-card-header d-flex align-items-center">
+                                            <div class="dashboard-header-icon bg-info-light rounded-circle me-2">
+                                                <i class="fa fa-clipboard-check text-info"></i>
+                                            </div>
+                                            <h6 class="mb-0">حسب الحالة</h6>
+                                        </div>
+                                        <div class="dashboard-card-body">
+                                            <div class="row text-center g-2">
+                                                <div class="col-4">
+                                                    <div class="category-item">
+                                                        <div class="category-icon bg-warning-light mb-2">
+                                                            <i class="fa fa-file text-warning"></i>
+                                                        </div>
+                                                        <div class="fw-bold text-warning pending_count">
+                                                            <t t-esc="record.pending_count.value"/>
+                                                        </div>
+                                                        <div class="text-muted small">طلب اعتماد</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="category-item">
+                                                        <div class="category-icon bg-success-light mb-2">
+                                                            <i class="fa fa-circle-check text-success"></i>
+                                                        </div>
+                                                        <div class="fw-bold text-success approved_count">
+                                                            <t t-esc="record.approved_count.value"/>
+                                                        </div>
+                                                        <div class="text-muted small">معتمدة</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="category-item">
+                                                        <div class="category-icon bg-danger-light mb-2">
+                                                            <i class="fa fa-circle-xmark text-danger"></i>
+                                                        </div>
+                                                        <div class="fw-bold text-danger rejected_count">
+                                                            <t t-esc="record.rejected_count.value"/>
+                                                        </div>
+                                                        <div class="text-muted small">مرفوضة</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- تغيير: إضافة عنصر canvas داخل div -->
+                                            <div class="mt-2 chart-container" style="height: 150px;">
+                                                <canvas t-att-id="'status-chart-' + record.id.raw_value"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- الصف الرابع: الاتجاهات -->
+                            <div class="row g-3 mt-2">
+                                <div class="col-12">
+                                    <div class="dashboard-trend-card bg-white shadow-sm rounded">
+                                        <div class="dashboard-card-header d-flex align-items-center">
+                                            <div class="dashboard-header-icon bg-primary-light rounded-circle me-2">
+                                                <i class="fa fa-chart-line text-primary"></i>
+                                            </div>
+                                            <h6 class="mb-0">الاتجاهات الشهرية</h6>
+                                        </div>
+                                        <div class="dashboard-card-body">
+                                            <!-- تغيير: إضافة عنصر canvas داخل div -->
+                                            <div class="chart-container" style="height: 200px;">
+                                                <canvas t-att-id="'trend-chart-' + record.id.raw_value"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_archive_dashboard_statistics" model="ir.actions.act_window">
+        <field name="name">إحصائيات الأرشيف</field>
+        <field name="res_model">archive.dashboard.stats</field>
+        <field name="view_mode">kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                لا توجد إحصائيات بعد
+            </p>
+            <p>
+                ستظهر هنا إحصائيات عن مستندات الأرشيف الخاصة بك
+            </p>
+        </field>
+    </record>
+</odoo>

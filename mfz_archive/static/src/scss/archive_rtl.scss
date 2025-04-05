@@ -1,0 +1,170 @@
+/* ملف: /mfz_archive/static/src/scss/archive_rtl.scss */
+
+/* تحسينات عامة للـ RTL */
+.o_rtl, .o_archive_management_summary {
+    direction: rtl;
+    text-align: right;
+
+    /* تبديل محاذاة العناوين */
+    h1, h2, h3, h4, h5, h6 {
+        text-align: right;
+    }
+
+    /* تحسينات القوائم */
+    .o_list_view thead > tr > th {
+        text-align: right;
+    }
+
+    /* تعديل جانب الأزرار */
+    .o_form_buttons_view {
+        text-align: left;
+    }
+
+    /* تنسيق حقول الإدخال */
+    .o_input, .o_field_widget {
+        text-align: right;
+    }
+
+    /* تنسيق المجموعات */
+    .o_group {
+        &.o_inner_group {
+            > tbody > tr > td.o_td_label {
+                padding-left: 15px;
+                padding-right: 0;
+            }
+        }
+    }
+
+    /* تنسيق خاص بالتبويبات */
+    .nav-tabs {
+        padding-right: 0;
+
+        .nav-link {
+            margin-left: 2px;
+            margin-right: 0;
+        }
+    }
+
+    /* تحسينات مربعات الحوار */
+    .modal-header {
+        .modal-title {
+            text-align: right;
+        }
+        .close {
+            margin: -1rem auto -1rem -1rem;
+        }
+    }
+
+    /* تحسين المرفقات */
+    .o_attachment_rtl {
+        .o_attachment {
+            float: right;
+            margin: 0 0 10px 10px;
+        }
+    }
+
+    /* المسافات والهوامش للعناصر الداخلية */
+    .me-1 {
+        margin-left: 0.25rem !important;
+        margin-right: 0 !important;
+    }
+
+    .me-2 {
+        margin-left: 0.5rem !important;
+        margin-right: 0 !important;
+    }
+
+    .ms-1 {
+        margin-right: 0.25rem !important;
+        margin-left: 0 !important;
+    }
+
+    .ms-2 {
+        margin-right: 0.5rem !important;
+        margin-left: 0 !important;
+    }
+
+    /* تحسين أيقونات الحقول */
+    .o_field_widget .o_input_icon {
+        right: auto;
+        left: 4px;
+    }
+}
+
+/* تنسيقات خاصة لمستندات الأرشيف */
+.archive-management-form {
+    /* تنسيقات رأس المستند */
+    .oe_title {
+        padding-right: 80px;
+        padding-left: 0;
+    }
+
+    /* تنسيق حقل الوصف */
+    .o_text_right {
+        text-align: right !important;
+        direction: rtl;
+        font-family: 'Tajawal', sans-serif;
+    }
+
+    /* تنسيق أقسام PDF */
+    .pdf_section {
+        border-right: 5px solid #e2e2e2;
+        border-left: none;
+        padding-right: 15px;
+        margin-top: 15px;
+    }
+
+    /* تنسيق حالة المستند */
+    .statusbar {
+        justify-content: flex-end;
+
+        .o_statusbar_status {
+            margin-right: auto;
+            margin-left: 0;
+        }
+    }
+
+    /* تحسين خط العربية */
+    input, textarea, select, .o_field_widget {
+        font-family: 'Tajawal', sans-serif;
+    }
+}
+
+/* تنسيقات لوحة Kanban */
+.o_kanban_renderer.o_rtl {
+    .o_kanban_record {
+        .o_kanban_record_top {
+            .o_kanban_record_headings {
+                margin-right: 0;
+                margin-left: auto;
+            }
+        }
+    }
+}
+
+/* تحسين الخط العربي عموماً */
+@font-face {
+    font-family: 'Tajawal';
+    src: url('/mfz_archive/static/src/fonts/Tajawal-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Tajawal';
+    src: url('/mfz_archive/static/src/fonts/Tajawal-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* القواعد العامة لخط طاجوال */
+.o_rtl, .archive-management-form, .o_archive_management_summary {
+    font-family: 'Tajawal', sans-serif;
+}
+
+/* تحسين لوحات المعلومات */
+.archive_document_header {
+    .text-end {
+        text-align: left !important;
+    }
+}

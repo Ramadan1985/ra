@@ -3,42 +3,125 @@
     <data noupdate="0">
         <!-- تعريف فئة مجموعات المستخدمين -->
         <record id="module_archive_management_category" model="ir.module.category">
-            <field name="name">Archive Management</field>
-            <field name="description">Helps you manage your archive documents.</field>
+            <field name="name">إدارة الأرشيف</field>
+            <field name="description">إدارة مستندات الأرشيف والوثائق</field>
             <field name="sequence">20</field>
         </record>
 
-        <!-- مجموعة المستخدمين العاديين -->
-        <record id="group_archive_user" model="res.groups">
-            <field name="name">User</field>
+        <!-- مجموعة المعتمدين -->
+        <record id="group_archive_approver" model="res.groups">
+            <field name="name">معتمد المستندات</field>
             <field name="category_id" ref="module_archive_management_category"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
-        <!-- مجموعة المديرين -->
-        <record id="group_archive_manager" model="res.groups">
-            <field name="name">Manager</field>
+        <!-- مجموعة الحذف -->
+        <record id="group_archive_deleter" model="res.groups">
+            <field name="name">حذف المستندات</field>
+            <field name="category_id" ref="module_archive_management_category"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- مجموعة المستخدمين العاديين -->
+        <record id="group_archive_user" model="res.groups">
+            <field name="name">مستخدم</field>
+            <field name="category_id" ref="module_archive_management_category"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- مجموعة مسؤول المستندات الواردة -->
+        <record id="group_archive_incoming_manager" model="res.groups">
+            <field name="name">مسؤول المستندات الواردة</field>
             <field name="category_id" ref="module_archive_management_category"/>
             <field name="implied_ids" eval="[(4, ref('group_archive_user'))]"/>
+        </record>
+
+        <!-- مجموعة مسؤول المستندات الصادرة -->
+        <record id="group_archive_outgoing_manager" model="res.groups">
+            <field name="name">مسؤول المستندات الصادرة</field>
+            <field name="category_id" ref="module_archive_management_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_archive_user'))]"/>
+        </record>
+
+        <!-- مجموعة مسؤول المذكرات الداخلية -->
+        <record id="group_archive_memo_manager" model="res.groups">
+            <field name="name">مسؤول المذكرات الداخلية</field>
+            <field name="category_id" ref="module_archive_management_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_archive_user'))]"/>
+        </record>
+
+        <!-- مجموعة المديرين (لديهم كل الصلاحيات) -->
+        <record id="group_archive_manager" model="res.groups">
+            <field name="name">مدير النظام</field>
+            <field name="category_id" ref="module_archive_management_category"/>
+            <field name="implied_ids" eval="[
+                (4, ref('group_archive_user')),
+                (4, ref('group_archive_incoming_manager')),
+                (4, ref('group_archive_outgoing_manager')),
+                (4, ref('group_archive_memo_manager')),
+                (4, ref('group_archive_approver')),
+                (4, ref('group_archive_deleter'))
+            ]"/>
             <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
     </data>
 
     <data noupdate="1">
-        <!-- قواعد للمستخدمين العاديين -->
+        <!-- قواعد للمستخدمين العاديين - يرون فقط المستندات الخاصة بهم -->
         <record id="rule_archive_management_user" model="ir.rule">
-            <field name="name">Archive User: See own documents</field>
+            <field name="name">مستخدم الأرشيف: رؤية المستندات الخاصة فقط</field>
             <field name="model_id" ref="model_archive_management"/>
             <field name="domain_force">['|', ('user_id', '=', user.id), ('create_uid', '=', user.id)]</field>
             <field name="groups" eval="[(4, ref('group_archive_user'))]"/>
         </record>
 
-        <!-- قواعد للمديرين -->
+        <!-- قواعد لمسؤولي المستندات الواردة -->
+        <record id="rule_archive_incoming_manager" model="ir.rule">
+            <field name="name">مسؤول المستندات الواردة: رؤية جميع المستندات الواردة</field>
+            <field name="model_id" ref="model_archive_management"/>
+            <field name="domain_force">[('document_type', '=', 'incoming')]</field>
+            <field name="groups" eval="[(4, ref('group_archive_incoming_manager'))]"/>
+        </record>
+
+        <!-- قواعد لمسؤولي المستندات الصادرة -->
+        <record id="rule_archive_outgoing_manager" model="ir.rule">
+            <field name="name">مسؤول المستندات الصادرة: رؤية جميع المستندات الصادرة</field>
+            <field name="model_id" ref="model_archive_management"/>
+            <field name="domain_force">[('document_type', '=', 'outgoing')]</field>
+            <field name="groups" eval="[(4, ref('group_archive_outgoing_manager'))]"/>
+        </record>
+
+        <!-- قواعد لمسؤولي المذكرات الداخلية -->
+        <record id="rule_archive_memo_manager" model="ir.rule">
+            <field name="name">مسؤول المذكرات الداخلية: رؤية جميع المذكرات الداخلية</field>
+            <field name="model_id" ref="model_archive_management"/>
+            <field name="domain_force">[('document_type', '=', 'memo')]</field>
+            <field name="groups" eval="[(4, ref('group_archive_memo_manager'))]"/>
+        </record>
+
+        <!-- قواعد للمديرين - يرون جميع المستندات -->
         <record id="rule_archive_management_manager" model="ir.rule">
-            <field name="name">Archive Manager: See all documents</field>
+            <field name="name">مدير الأرشيف: رؤية جميع المستندات</field>
             <field name="model_id" ref="model_archive_management"/>
             <field name="domain_force">[(1, '=', 1)]</field>
             <field name="groups" eval="[(4, ref('group_archive_manager'))]"/>
+        </record>
+
+        <!-- قواعد للمعتمدين -->
+        <record id="rule_archive_management_approver" model="ir.rule">
+            <field name="name">معتمد الأرشيف: رؤية المستندات في حالة الانتظار</field>
+            <field name="model_id" ref="model_archive_management"/>
+            <field name="domain_force">[('state', '=', 'pending')]</field>
+            <field name="groups" eval="[(4, ref('group_archive_approver'))]"/>
+        </record>
+
+        <!-- قواعد للحاذفين -->
+        <record id="rule_archive_management_deleter" model="ir.rule">
+            <field name="name">حذف المستندات: يمكن حذف المستندات في حالة الانتظار</field>
+            <field name="model_id" ref="model_archive_management"/>
+            <field name="domain_force">[('state', '=', 'pending')]</field>
+            <field name="perm_unlink" eval="True"/>
+            <field name="groups" eval="[(4, ref('group_archive_deleter'))]"/>
         </record>
     </data>
 </odoo>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_archive_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" dir="rtl" style="font-family: 'Tajawal', sans-serif;">
+                        <!-- رأس المستند -->
+                        <div class="row mb-4 mt-4">
+                            <div class="col-6">
+                                <h2 t-field="doc.name" class="text-right"/>
+                                <p class="text-right">
+                                    <strong>الرقم المرجعي:</strong> <span t-field="doc.reference"/>
+                                </p>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-left">
+                                    <strong>التاريخ:</strong> <span t-field="doc.date" t-options="{'widget': 'date'}"/>
+                                    <br/>
+                                    <strong>نوع المستند:</strong> <span t-field="doc.document_type"/>
+                                    <br/>
+                                    <strong>الحالة:</strong>
+                                    <span t-if="doc.state == 'pending'" class="badge badge-info">قيد الانتظار</span>
+                                    <span t-if="doc.state == 'approved'" class="badge badge-success">معتمد</span>
+                                    <span t-if="doc.state == 'rejected'" class="badge badge-danger">مرفوض</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- معلومات المستند -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <table class="table table-bordered table-sm">
+                                    <tr>
+                                        <th class="table-active text-right" style="width: 20%;">المرسل</th>
+                                        <td class="text-right" style="width: 30%;"><span t-field="doc.sent_by"/></td>
+                                        <th class="table-active text-right" style="width: 20%;">الموجه له</th>
+                                        <td class="text-right" style="width: 30%;"><span t-field="doc.directed_to"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="table-active text-right">التصنيف</th>
+                                        <td class="text-right"><span t-field="doc.category_id"/></td>
+                                        <th class="table-active text-right">مستوى السرية</th>
+                                        <td class="text-right"><span t-field="doc.confidentiality"/></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="table-active text-right">المسؤول</th>
+                                        <td class="text-right"><span t-field="doc.user_id"/></td>
+                                        <th class="table-active text-right">الأولوية</th>
+                                        <td class="text-right">
+                                            <span t-if="doc.priority == '0'">عادي</span>
+                                            <span t-if="doc.priority == '1'">متوسط</span>
+                                            <span t-if="doc.priority == '2'">مهم</span>
+                                            <span t-if="doc.priority == '3'">عالي</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- محتوى المستند -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4 class="text-right">محتوى المستند</h4>
+                                <div class="border p-3 bg-light text-right" style="min-height: 200px;">
+                                    <p t-field="doc.description"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الملاحظات -->
+                        <div class="row mb-4" t-if="doc.notes">
+                            <div class="col-12">
+                                <h4 class="text-right">ملاحظات</h4>
+                                <div class="border p-3 bg-light text-right">
+                                    <p t-field="doc.notes"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- سجل الاعتماد -->
+                        <div class="row mt-5">
+                            <div class="col-4 offset-8">
+                                <p class="text-center">المسؤول: <span t-field="doc.user_id"/></p>
+                                <p class="text-center mt-5">________________</p>
+                                <p class="text-center">التوقيع</p>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- تعريف التقرير -->
+    <record id="action_report_archive_document" model="ir.actions.report">
+        <field name="name">تقرير المستند</field>
+        <field name="model">archive.management</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mfz_archive.report_archive_document</field>
+        <field name="report_file">mfz_archive.report_archive_document</field>
+        <field name="binding_model_id" ref="model_archive_management"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

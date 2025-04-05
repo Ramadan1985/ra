@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- تعريف جميع الإجراءات في ملف واحد -->
+
+    <!-- إجراء كافة المستندات - لمدراء النظام -->
+    <record id="action_archive_management" model="ir.actions.act_window">
+        <field name="name">إدارة الأرشيف</field>
+        <field name="res_model">archive.management</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_my_documents': 0}</field>
+        <field name="groups_id" eval="[(4, ref('mfz_archive.group_archive_manager'))]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                هنا يمكنك إدارة كافة الوثائق الأرشيفية
+            </p>
+            <p>
+                كمدير للنظام، يمكنك الوصول لجميع أنواع المستندات والتحكم فيها بشكل كامل.
+            </p>
+        </field>
+    </record>
+
+    <!-- إجراءات الأنواع المختلفة للمستندات -->
+    <record id="action_archive_incoming" model="ir.actions.act_window">
+        <field name="name">المستندات الواردة</field>
+        <field name="res_model">archive.management</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('document_type', '=', 'incoming')]</field>
+        <field name="context">{'default_document_type': 'incoming', 'search_default_incoming': 1}</field>
+        <field name="groups_id" eval="[(4, ref('mfz_archive.group_archive_manager')), (4, ref('mfz_archive.group_archive_incoming_manager'))]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ مستند وارد جديد
+            </p>
+            <p>
+                سجل وثائق الوارد وتتبع مسارها وإجراءاتها.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_archive_outgoing" model="ir.actions.act_window">
+        <field name="name">المستندات الصادرة</field>
+        <field name="res_model">archive.management</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('document_type', '=', 'outgoing')]</field>
+        <field name="context">{'default_document_type': 'outgoing', 'search_default_outgoing': 1}</field>
+        <field name="groups_id" eval="[(4, ref('mfz_archive.group_archive_manager')), (4, ref('mfz_archive.group_archive_outgoing_manager'))]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ مستند صادر جديد
+            </p>
+            <p>
+                سجل المستندات الصادرة وتتبع مسارها ومراسلاتها.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_archive_memo" model="ir.actions.act_window">
+        <field name="name">المذكرات الداخلية</field>
+        <field name="res_model">archive.management</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('document_type', '=', 'memo')]</field>
+        <field name="context">{'default_document_type': 'memo', 'search_default_memo': 1}</field>
+        <field name="groups_id" eval="[(4, ref('mfz_archive.group_archive_manager')), (4, ref('mfz_archive.group_archive_memo_manager'))]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                أنشئ مذكرة داخلية جديدة
+            </p>
+            <p>
+                أرشفة المذكرات الداخلية وتتبع سير العمل عليها.
+            </p>
+        </field>
+    </record>
+
+    <!-- إجراء لوحة المعلومات الإحصائية -->
+    <record id="action_archive_dashboard_stats" model="ir.actions.act_window">
+        <field name="name">إحصائيات الأرشيف</field>
+        <field name="res_model">archive.dashboard.stats</field>
+        <field name="view_mode">kanban</field>
+        <field name="groups_id" eval="[(4, ref('mfz_archive.group_archive_manager'))]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                لم يتم العثور على إحصائيات
+            </p>
+            <p>
+                قم بإنشاء مستندات جديدة لتظهر الإحصائيات.
+            </p>
+        </field>
+    </record>
+
+    <!-- إجراءات نماذج الإعدادات -->
+    <record id="action_archive_directed_to" model="ir.actions.act_window">
+        <field name="name">موجه إلى</field>
+        <field name="res_model">archive.directed.to</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_archive_sent_by" model="ir.actions.act_window">
+        <field name="name">مرسل من</field>
+        <field name="res_model">archive.sent.by</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_archive_category" model="ir.actions.act_window">
+        <field name="name">التصنيفات</field>
+        <field name="res_model">archive.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="groups_id" eval="[(4, ref('mfz_archive.group_archive_manager'))]"/>
+    </record>
+
+    <record id="action_archive_tag" model="ir.actions.act_window">
+        <field name="name">الوسوم</field>
+        <field name="res_model">archive.tag</field>
+        <field name="view_mode">list,form</field>
+        <field name="groups_id" eval="[(4, ref('mfz_archive.group_archive_manager'))]"/>
+    </record>
+</odoo>

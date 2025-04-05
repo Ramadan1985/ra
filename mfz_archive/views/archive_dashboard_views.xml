@@ -1,54 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Graph View -->
-    <record id="view_archive_dashboard_graph" model="ir.ui.view">
-        <field name="name">archive.management.graph</field>
-        <field name="model">archive.management</field>
+    <record id="view_archive_dashboard_kanban" model="ir.ui.view">
+        <field name="name">archive.dashboard.kanban</field>
+        <field name="model">archive.dashboard.stats</field>
         <field name="arch" type="xml">
-            <graph string="Documents" type="bar">
-                <field name="document_type"/>
-                <field name="state"/>
-            </graph>
-        </field>
-    </record>
-
-    <!-- Pivot View -->
-    <record id="view_archive_dashboard_pivot" model="ir.ui.view">
-        <field name="name">archive.management.pivot</field>
-        <field name="model">archive.management</field>
-        <field name="arch" type="xml">
-            <pivot string="Documents Analysis" display_quantity="true">
-                <field name="document_type" type="row"/>
-                <field name="state" type="col"/>
-            </pivot>
-        </field>
-    </record>
-
-    <!-- Calendar View -->
-    <record id="view_archive_dashboard_calendar" model="ir.ui.view">
-        <field name="name">archive.management.calendar</field>
-        <field name="model">archive.management</field>
-        <field name="arch" type="xml">
-            <calendar string="Documents" date_start="date" mode="month" color="document_type">
+            <!-- إضافة فئات للنطاق المحدد هنا -->
+            <kanban js_class="mfz_archive_dashboard" create="false" edit="false" delete="false" class="o_dashboard_view o_mfz_archive_view mfz_archive_dashboard">
+                <!-- حقول مطلوبة للبيانات -->
                 <field name="name"/>
-                <field name="document_type"/>
-            </calendar>
-        </field>
-    </record>
+                <field name="total_documents"/>
+                <field name="incoming_count"/>
+                <field name="outgoing_count"/>
+                <field name="memo_count"/>
+                <field name="pending_count"/>
+                <field name="approved_count"/>
+                <field name="rejected_count"/>
+                <field name="this_month_count"/>
+                <field name="last_month_count"/>
+                <field name="efficiency_rate"/>
 
-    <!-- Dashboard Action -->
-    <record id="action_archive_dashboard" model="ir.actions.act_window">
-        <field name="name">Documents Dashboard</field>
-        <field name="res_model">archive.management</field>
-        <field name="view_mode">graph,pivot,calendar</field>
-        <field name="context">{'search_default_group_by_type': 1}</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                No documents found
-            </p>
-            <p>
-                Create new documents to see statistics.
-            </p>
+                <templates>
+                    <t t-name="card">
+                        <!-- إضافة فئات للنطاق المحدد هنا أيضاً -->
+                        <div class="container-fluid dashboard-container archive_dashboard_container o_mfz_archive_view mfz_archive_dashboard">
+                            <!-- صف البطاقات الإحصائية -->
+                            <div class="row mb-4">
+                                <div class="col-md-3 col-sm-6 col-12 mb-3">
+                                    <div class="stats-card bg-primary-gradient">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <i class="fa fa-file-text-o me-2"></i>
+                                                إجمالي المستندات
+                                            </h5>
+                                            <div class="card-value"><t t-esc="record.total_documents.raw_value || 0"/></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 col-12 mb-3">
+                                    <div class="stats-card bg-success-gradient">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <i class="fa fa-arrow-circle-down me-2"></i>
+                                                المستندات الواردة
+                                            </h5>
+                                            <div class="card-value"><t t-esc="record.incoming_count.raw_value || 0"/></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 col-12 mb-3">
+                                    <div class="stats-card bg-info-gradient">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <i class="fa fa-arrow-circle-up me-2"></i>
+                                                المستندات الصادرة
+                                            </h5>
+                                            <div class="card-value"><t t-esc="record.outgoing_count.raw_value || 0"/></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-sm-6 col-12 mb-3">
+                                    <div class="stats-card bg-warning-gradient">
+                                        <div class="card-body">
+                                            <h5 class="card-title">
+                                                <i class="fa fa-sticky-note me-2"></i>
+                                                المذكرات الداخلية
+                                            </h5>
+                                            <div class="card-value"><t t-esc="record.memo_count.raw_value || 0"/></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- صف المخططات -->
+                            <div class="row g-3">
+                                <div class="col-md-6 mb-3">
+                                    <div class="dashboard-category-card">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold">توزيع المستندات حسب النوع</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-container">
+                                                <canvas class="type-chart" data-type="pie"
+                                                    t-att-data-incoming="record.incoming_count.raw_value || 0"
+                                                    t-att-data-outgoing="record.outgoing_count.raw_value || 0"
+                                                    t-att-data-memo="record.memo_count.raw_value || 0"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="dashboard-category-card">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold">توزيع المستندات حسب الحالة</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-container">
+                                                <canvas class="state-chart" data-type="pie"
+                                                    t-att-data-draft="record.pending_count.raw_value || 0"
+                                                    t-att-data-validated="record.approved_count.raw_value || 0"
+                                                    t-att-data-rejected="record.rejected_count.raw_value || 0"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- صف مخطط الاتجاهات الشهرية -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="dashboard-category-card">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold">الاتجاهات الشهرية</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-container">
+                                                <canvas class="trend-chart" data-type="bar"
+                                                    t-att-data-this-month="record.this_month_count.raw_value || 0"
+                                                    t-att-data-last-month="record.last_month_count.raw_value || 0"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
-</odoo>
+</odoo>  

@@ -1,0 +1,64 @@
+/* إصلاح مشكلة عرض لوحة المعلومات */
+.o_view_controller,
+.o_kanban_view,
+.o_content,
+.o_kanban_renderer,
+.o_dashboard_view,
+.o_kanban_record,
+.o_view_controller > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* التأكيد على أن الحاوية تأخذ العرض الكامل */
+.dashboard-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+/* التأكد من عرض الصفوف بشكل صحيح */
+.dashboard-container .row {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+/* التأكد من عرض المخططات بالكامل */
+.chart-container {
+    width: 100% !important;
+    position: relative !important;
+}
+
+/* ضمان أن الأعمدة تأخذ المساحة الصحيحة */
+.dashboard-container .col-md-6,
+.dashboard-container .col-md-3,
+.dashboard-container .col-12 {
+    padding: 0 10px !important;
+    float: right !important;
+}
+
+/* قواعد كسر القيود CSS المستعصية */
+.o_kanban_record {
+    float: none !important;
+    position: static !important;
+    display: block !important;
+    transform: none !important;
+}
+
+/* للحالات الخاصة جدًا! */
+#o_content,
+.o_action_manager,
+.o_action,
+.o_renderer_with_searchpanel,
+.o_kanban {
+    width: 100% !important;
+    max-width: 100% !important;
+}
